@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Hoàng Xuân Quốc</title>
+    <meta name="description" content="Portfolio cá nhân của Hoàng Xuân Quốc">
+    <meta name="keywords" content="portfolio, hoàng xuân quốc, data analyst">
+    <link rel="icon" href="assets/image/favicon-16.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Xanh dương sáng */
+            --secondary-color: #e0f2fe; /* Xanh nhạt */
+        }
+    </style>
+</head>
+<body class="bg-secondary-color text-gray-900">
+    <!-- Navbar -->
+    <nav class="bg-primary-color text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-xl font-bold">Portfolio</h1>
+        <ul class="flex gap-4">
+            <li><a href="#about" class="hover:underline">Giới thiệu</a></li>
+            <li><a href="#education" class="hover:underline">Học vấn</a></li>
+            <li><a href="#experience" class="hover:underline">Kinh nghiệm</a></li>
+            <li><a href="#activities" class="hover:underline">Hoạt động</a></li>
+            <li><a href="#projects" class="hover:underline">Dự án</a></li>
+            <li><a href="#contact" class="hover:underline">Liên hệ</a></li>
+        </ul>
+    </nav>
+
+    <!-- Giới thiệu -->
+    <section id="about" class="text-center py-16">
+        <!-- Content from API -->
+    </section>
+
+    <!-- Học vấn -->
+    <section id="education" class="py-16 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Học Vấn</h2>
+        <div id="education-list" class="text-left px-6 max-w-3xl mx-auto">
+            <!-- Nội dung từ API -->
+        </div>
+    </section>
+
+    <!-- Kinh nghiệm làm việc -->
+    <section id="experience" class="py-16 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Kinh Nghiệm Làm Việc</h2>
+        <div id="experience-list" class="text-left px-6 max-w-3xl mx-auto">
+            <!-- Nội dung từ API -->
+        </div>
+    </section>
+
+
+
+    <!-- Dự án -->
+    <section id="projects" class="py-16 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Dự Án</h2>
+        <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
+            <!-- Nội dung từ API -->
+        </div>
+    </section>
+
+    <!-- Liên hệ -->
+    <section id="contact" class="py-16 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Liên hệ</h2>
+        <p>Email: <a href="mailto:hoangquocbusinesstech@gmail.com" class="text-primary-color">hoangquocbusinesstech@gmail.com</a></p>
+    </section>
+
+    <script>
+        async function loadData() {
+            const educationRes = await fetch("http://localhost:8000/education");
+            const education = await educationRes.json();
+            document.getElementById("education-list").innerHTML = education.map(e => `
+                <p class="text-lg font-semibold">${e.degree} - ${e.school} (${e.year})</p>
+                <p class="text-gray-600 mb-4">${e.description}</p>
+            `).join("");
+
+            const experienceRes = await fetch("http://localhost:8000/experience");
+            const experience = await experienceRes.json();
+            document.getElementById("experience-list").innerHTML = experience.map(e => `
+                <p class="text-lg font-semibold">${e.title} - ${e.company} (${e.year})</p>
+                <p class="text-gray-600 mb-4">${e.description}</p>
+            `).join("");
+
+            const profileRes = await fetch("http://localhost:8000/profile");
+            const profile = await profileRes.json();
+            document.getElementById("about").innerHTML = `
+                <img src="${profile.avatar}" alt="Ảnh đại diện" class="w-32 h-32 mx-auto rounded-full shadow-lg">
+                <h2 class="text-3xl font-semibold mt-4">${profile.name}</h2>
+                <p class="text-lg mt-2">${profile.title}</p>
+            `;
+
+            // const activitiesRes = await fetch("http://localhost:8000/activities");
+            // const activities = await activitiesRes.json();
+            // document.getElementById("activities-list").innerHTML = activities.map(a => `
+            //     <p class="text-lg font-semibold">${a.name} (${a.year})</p>
+            //     <p class="text-gray-600 mb-4">${a.description}</p>
+            // `).join("");
+
+            const projectsRes = await fetch("http://localhost:8000/projects");
+            const projects = await projectsRes.json();
+            document.getElementById("project-list").innerHTML = projects.map(p => `
+                <div class="bg-white p-4 shadow-lg rounded-lg">
+                    <h3 class="text-xl font-bold">${p.title}</h3>
+                    <p class="text-gray-600">${p.description}</p>
+                    <a href="${p.github_link}" class="text-primary-color">Xem GitHub</a>
+                </div>
+            `).join("");
+        }
+        loadData();
+    </script>
+</body>
+</html>

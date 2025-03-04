@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Dự Án</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Xanh dương sáng */
+            --secondary-color: #e0f2fe; /* Xanh nhạt */
+        }
+    </style>
+</head>
+<body class="bg-secondary-color text-gray-900">
+    <!-- Navbar -->
+    <nav class="bg-primary-color text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-xl font-bold">Admin Dashboard</h1>
+        <ul class="flex gap-4">
+            <li><a href="index.html" class="hover:underline">Trang Chủ</a></li>
+            <li><a href="projects.html" class="hover:underline">Dự Án</a></li>
+        </ul>
+    </nav>
+
+    <!-- Quản lý dự án -->
+    <section class="py-16 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Quản Lý Dự Án</h2>
+        <form id="project-form" class="max-w-lg mx-auto bg-white p-6 shadow-lg rounded-lg">
+            <input type="text" id="title" placeholder="Tiêu đề dự án" class="w-full p-2 mb-4 border rounded">
+            <textarea id="description" placeholder="Mô tả" class="w-full p-2 mb-4 border rounded"></textarea>
+            <input type="text" id="image" placeholder="URL hình ảnh" class="w-full p-2 mb-4 border rounded">
+            <input type="text" id="github_link" placeholder="Link GitHub" class="w-full p-2 mb-4 border rounded">
+            <button type="submit" class="bg-primary-color text-white px-4 py-2 rounded">Thêm Dự Án</button>
+        </form>
+    </section>
+
+    <section class="py-16 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Danh Sách Dự Án</h2>
+        <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
+            <!-- Nội dung từ API -->
+        </div>
+    </section>
+
+    <script>
+        async function loadProjects() {
+            const response = await fetch("http://localhost:8000/projects");
+            const projects = await response.json();
+            const projectList = document.getElementById("project-list");
+            projectList.innerHTML = projects.map(p => `
+                <div class="bg-white p-4 shadow-lg rounded-lg relative">
+                    <h3 class="text-xl font-bold">${p.title}</h3>
+                    <p class="text-gray-600">${p.description}</p>
+                    <a href="${p.github_link}" class="text-primary-color">Xem GitHub</a>
+                    <button onclick="deleteProject(${p.id})" class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded">Xóa</button>
+                </div>
+            `).join("");
+        }
+
+        async function deleteProject(id) {
+            await fetch(`http://localhost:8000/projects/${id}`, { method: "DELETE" });
+            loadProjects();
+        }
+
+        document.getElementById("project-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const project = {
+                title: document.getElementById("title").value,
+                description: document.getElementById("description").value,
+                image: document.getElementById("image").value,
+                github_link: document.getElementById("github_link").value,
+            };
+            await fetch("http://localhost:8000/projects", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(project),
+            });
+            loadProjects();
+            document.getElementById("project-form").reset();
+        });
+
+        loadProjects();
+    </script>
+</body>
+</html>

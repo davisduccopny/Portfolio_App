@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự Án - Hoàng Xuân Quốc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Xanh dương sáng */
+            --secondary-color: #e0f2fe; /* Xanh nhạt */
+        }
+    </style>
+</head>
+<body class="bg-secondary-color text-gray-900">
+    <!-- Navbar -->
+    <nav class="bg-primary-color text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-xl font-bold">Portfolio</h1>
+        <ul class="flex gap-4">
+            <li><a href="index.html" class="hover:underline">Trang Chủ</a></li>
+            <li><a href="#projects" class="hover:underline">Dự Án</a></li>
+            <li><a href="contact.html" class="hover:underline">Liên hệ</a></li>
+        </ul>
+    </nav>
+
+    <!-- Danh sách dự án -->
+    <section id="projects" class="py-16 text-center">
+        <h2 class="text-3xl font-semibold mb-6">Danh Sách Dự Án</h2>
+        <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
+            <!-- Nội dung từ API -->
+        </div>
+    </section>
+
+    <script>
+        async function loadProjects() {
+            const response = await fetch("http://localhost:8000/projects");
+            const projects = await response.json();
+            const projectList = document.getElementById("project-list");
+            projectList.innerHTML = projects.map(p => `
+                <div class="bg-white p-6 shadow-lg rounded-lg">
+                    <h3 class="text-xl font-bold">${p.title}</h3>
+                    <p class="text-gray-600">${p.description}</p>
+                    <a href="project_detail.html?id=${p.id}" class="text-primary-color font-semibold">Chi tiết</a>
+                </div>
+            `).join("");
+        }
+        loadProjects();
+    </script>
+</body>
+</html>

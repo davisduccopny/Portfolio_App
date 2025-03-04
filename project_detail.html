@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Dự Án</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Xanh dương sáng */
+            --secondary-color: #e0f2fe; /* Xanh nhạt */
+        }
+    </style>
+</head>
+<body class="bg-secondary-color text-gray-900">
+    <!-- Navbar -->
+    <nav class="bg-primary-color text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-xl font-bold">Portfolio</h1>
+        <ul class="flex gap-4">
+            <li><a href="index.html" class="hover:underline">Trang Chủ</a></li>
+            <li><a href="projects.html" class="hover:underline">Dự Án</a></li>
+            <li><a href="contact.html" class="hover:underline">Liên hệ</a></li>
+        </ul>
+    </nav>
+
+    <!-- Chi tiết dự án -->
+    <section id="project-detail" class="py-16 text-center">
+        <h2 id="project-title" class="text-3xl font-semibold mb-4"></h2>
+        <img id="project-image" src="" alt="Project Image" class="w-1/2 mx-auto shadow-lg rounded-lg">
+        <p id="project-description" class="text-lg mt-4"></p>
+        <a id="project-link" href="#" class="text-primary-color font-semibold mt-4 inline-block">Xem trên GitHub</a>
+    </section>
+
+    <script>
+        async function loadProjectDetail() {
+            const params = new URLSearchParams(window.location.search);
+            const projectId = params.get("id");
+            if (!projectId) {
+                document.getElementById("project-detail").innerHTML = "<p class='text-red-500'>Dự án không tồn tại.</p>";
+                return;
+            }
+
+            const response = await fetch(`http://localhost:8000/projects/${projectId}`);
+            if (!response.ok) {
+                document.getElementById("project-detail").innerHTML = "<p class='text-red-500'>Không thể tải dự án.</p>";
+                return;
+            }
+            
+            const project = await response.json();
+            document.getElementById("project-title").textContent = project.title;
+            document.getElementById("project-image").src = project.image;
+            document.getElementById("project-description").textContent = project.description;
+            document.getElementById("project-link").href = project.github_link;
+        }
+        loadProjectDetail();
+    </script>
+</body>
+</html>
