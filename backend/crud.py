@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from models import Project, Profile, Experience, Education
+from models import Project, Profile, Experience, Education, Skills
 
 
 # Profile CRUD
@@ -15,6 +15,9 @@ def update_profile(session: Session, profile_data: Profile):
 def get_experiences(session: Session):
     return session.exec(select(Experience)).all()
 
+def get_experience_by_id(session: Session, experience_id: int):
+    return session.get(Experience, experience_id)
+
 def add_experience(session: Session, experience: Experience):
     session.add(experience)
     session.commit()
@@ -26,9 +29,13 @@ def delete_experience(session: Session, experience_id: int):
     if exp:
         session.delete(exp)
         session.commit()
+        
 # Education CRUD
 def get_education(session: Session):
     return session.exec(select(Education)).all()
+
+def get_education_by_id(session: Session, education_id: int):
+    return session.get(Education, education_id)
 
 def add_education(session: Session, education: Education):
     session.add(education)
@@ -41,6 +48,7 @@ def delete_education(session: Session, education_id: int):
     if edu:
         session.delete(edu)
         session.commit()
+        
 # Projects CRUD
 def get_all_projects(session: Session):
     return session.exec(select(Project)).all()
@@ -59,3 +67,21 @@ def delete_project(session: Session, project_id: int):
     if project:
         session.delete(project)
         session.commit()
+# Skills CRUD
+def get_skills(session: Session):
+    return session.exec(select(Skills)).all()
+
+def get_skill_by_id(session: Session, skill_id: int):
+    return session.get(Skills, skill_id)
+
+def create_skill(session: Session, skill: Skills):
+    session.add(skill)
+    session.commit()
+    session.refresh(skill)
+    return skill
+def delete_skill(session: Session, skill_id: int):
+    skill = session.get(Skills, skill_id)
+    if skill:
+        session.delete(skill)
+        session.commit()
+        

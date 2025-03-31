@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from database import get_session
-from crud import get_all_projects, get_project_by_id, create_project, delete_project,get_profile, update_profile, get_experiences, add_experience, delete_experience, get_education, add_education, delete_education
-from models import Project,Profile, Experience, Education
-from schemas import ProjectCreate,ProfileUpdate, ExperienceCreate, EducationCreate
+from crud import get_all_projects, get_project_by_id, create_project, delete_project,get_profile, update_profile, get_experiences, add_experience, delete_experience, get_education, add_education, delete_education,get_skills,create_skill,delete_skill
+from crud import get_education_by_id,get_experience_by_id,get_skill_by_id
+from models import Project,Profile, Experience, Education, Skills
+from schemas import ProjectCreate,ProfileUpdate, ExperienceCreate, EducationCreate, SkillCreate
 
 router = APIRouter()
 
@@ -30,6 +31,13 @@ def update_profile_info(profile_data: ProfileUpdate, session: Session = Depends(
 def read_experiences(session: Session = Depends(get_session)):
     return get_experiences(session)
 
+@router.get("/experience/{exp_id}")
+def read_experience(exp_id: int, session: Session = Depends(get_session)):
+    experience = get_experience_by_id(session, exp_id)
+    if not experience:
+        raise HTTPException(status_code=404, detail="Experience not found")
+    return experience
+
 @router.post("/experience")
 def create_experience(exp_data: ExperienceCreate, session: Session = Depends(get_session)):
     return add_experience(session, Experience(**exp_data.model_dump()))
@@ -39,10 +47,28 @@ def remove_experience(exp_id: int, session: Session = Depends(get_session)):
     delete_experience(session, exp_id)
     return {"message": "Experience deleted"}
 
+@router.put("/experience/{exp_id}")
+def update_experience(exp_id: int, exp_data: ExperienceCreate, session: Session = Depends(get_session)):
+    experience = get_experience_by_id(session, exp_id)
+    if not experience:
+        raise HTTPException(status_code=404, detail="Experience not found")
+    for key, value in exp_data.model_dump().items():
+        setattr(experience, key, value)
+    session.commit()
+    session.refresh(experience)
+    return experience
+
 # Manage education
 @router.get("/education")
 def read_education(session: Session = Depends(get_session)):
     return get_education(session)
+
+@router.get("/education/{edu_id}")
+def read_education_by_id(edu_id: int, session: Session = Depends(get_session)):
+    education = get_education_by_id(session, edu_id)
+    if not education:
+        raise HTTPException(status_code=404, detail="Education not found")
+    return education
 
 @router.post("/education")
 def create_education(edu_data: EducationCreate, session: Session = Depends(get_session)):
@@ -52,6 +78,17 @@ def create_education(edu_data: EducationCreate, session: Session = Depends(get_s
 def remove_education(edu_id: int, session: Session = Depends(get_session)):
     delete_education(session, edu_id)
     return {"message": "Education deleted"}
+
+@router.put("/education/{edu_id}")
+def update_education(edu_id: int, edu_data: EducationCreate, session: Session = Depends(get_session)):
+    education = get_education_by_id(session, edu_id)
+    if not education:
+        raise HTTPException(status_code=404, detail="Education not found")
+    for key, value in edu_data.model_dump().items():
+        setattr(education, key, value)
+    session.commit()
+    session.refresh(education)
+    return education
 
 # Manage projects
 @router.get("/projects")
@@ -86,3 +123,34 @@ def remove_project(project_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Project not found")
     delete_project(session, project_id)
     return {"message": "Project deleted successfully"}
+# Manage skills
+@router.get("/skills")
+def read_skills(session: Session = Depends(get_session)):
+    return get_skills(session)
+
+@router.get("/skills/{skill_id}")
+def read_skill(skill_id: int, session: Session = Depends(get_session)):
+    skill = get_skill_by_id(session, skill_id)
+    if not skill:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    return skill
+
+@router.post("/skills")
+def add_skill(skill: SkillCreate, session: Session = Depends(get_session)):
+    return create_skill(session, Skills(**skill.model_dump()))
+
+@router.delete("/skills/{skill_id}")
+def remove_skill(skill_id: int, session: Session = Depends(get_session)):
+    delete_skill(session, skill_id)
+    return {"message": "Skill deleted"}
+
+@router.put("/skills/{skill_id}")
+def update_skill(skill_id: int, skill_data: SkillCreate, session: Session = Depends(get_session)):
+    skill = get_skill_by_id(session, skill_id)
+    if not skill:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    for key, value in skill_data.model_dump().items():
+        setattr(skill, key, value)
+    session.commit()
+    session.refresh(skill)
+    return skill

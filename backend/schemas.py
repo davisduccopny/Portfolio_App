@@ -6,16 +6,41 @@ class ProjectCreate(BaseModel):
     title: str
     description: str
     image: Optional[str]
+    client: Optional[str]
+    project_date: Optional[str]
     github_link: Optional[str]
+    category: str
     
 class ProfileUpdate(BaseModel):
     """Pydantic model for Profile"""
     name: str
     title: str
-    avatar: Optional[str]
+    avatar: Optional[str]  
     background: Optional[str]
+    birthdate: Optional[str]
+    degree: Optional[str]
+    freelance: Optional[str] 
     email: str
-    about: str
+    phone: Optional[str]
+    address: Optional[str]
+    google_map: str
+    website: Optional[str]
+    x_link: Optional[str]
+    finallyacebook_link: Optional[str]
+    github_link: Optional[str]
+    linkedin_link: Optional[str]
+    instagram_link: Optional[str]
+    skype_link: Optional[str]
+    about: str 
+    sumary: Optional[str]
+    des_about_1: Optional[str]
+    des_about_2: Optional[str]
+    des_about_3: Optional[str]
+    des_about_4: Optional[str]
+    clients: Optional[int]
+    projects: Optional[int]
+    hours: Optional[int]
+    workers: Optional[int]
     
 class ExperienceCreate(BaseModel):
     """Pydantic model for Experience"""
@@ -31,3 +56,7 @@ class EducationCreate(BaseModel):
     school: str
     year: str
     description: str
+class SkillCreate(BaseModel):
+    """Pydantic model for Skills"""
+    skill: str
+    percentage: int
