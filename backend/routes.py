@@ -3,9 +3,10 @@ from sqlmodel import Session, select
 from database import get_session
 from crud import get_all_projects, get_project_by_id, delete_project,get_profile, get_experiences, add_experience, delete_experience, get_education, add_education, delete_education,get_skills,create_skill,delete_skill
 from crud import get_education_by_id,get_experience_by_id,get_skill_by_id
-from models import Project,Profile, Experience, Education, Skills
-from schemas import ProjectCreate,ProfileUpdate, ExperienceCreate, EducationCreate, SkillCreate
-from typing import List, Optional
+from models import Project,Profile, Experience, Education, Skills,Login
+from schemas import ProjectCreate,ProfileUpdate, ExperienceCreate, EducationCreate, SkillCreate,LoginCreate
+from typing import List, Optional,Union
+from config import BASE_URL, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 import re
 import io
@@ -13,8 +14,28 @@ import base64
 import os
 import uuid
 
+from passlib.context import CryptContext
+from datetime import datetime, timedelta,timezone
+from jose import JWTError, jwt
+from fastapi.security import OAuth2PasswordBearer
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter()
+
+# Verify token
+def verify_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if 'exp' not in payload or datetime.now(timezone.utc) > datetime.fromtimestamp(payload['exp'], tz=timezone.utc):
+            raise HTTPException(status_code=401, detail="Token has expired")
+        return True 
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+@router.post("/verify_token")
+async def verify_token_endpoint(token: str = Depends(verify_token)):
+    return {"message": "Token is valid"}
 
 # Manage profile
 @router.get("/profile")
@@ -22,6 +43,10 @@ def read_profile(session: Session = Depends(get_session)):
     profile = get_profile(session)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
+    if profile.avatar:  
+        profile.avatar = f"{BASE_URL}{profile.avatar}"
+    if profile.background:
+        profile.background = f"{BASE_URL}{profile.background}"
     return profile
 
 UPLOAD_DIR = "static/uploads"
@@ -73,9 +98,10 @@ async def update_profile_info(
     workers: Optional[int] = Form(None),
     avatar: Optional[UploadFile] = File(None),
     background: Optional[UploadFile] = File(None),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    valid_token: bool = Depends(verify_token)
 ):
-    """Cập nhật profile và lưu ảnh lên server"""
+    """Update profile information"""
     profile = session.exec(select(Profile)).first()
     if not profile:
         profile = Profile()
@@ -162,16 +188,19 @@ def read_experience(exp_id: int, session: Session = Depends(get_session)):
     return experience
 
 @router.post("/experience")
-def create_experience(exp_data: ExperienceCreate, session: Session = Depends(get_session)):
+def create_experience(exp_data: ExperienceCreate, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Create a new experience"""
     return add_experience(session, Experience(**exp_data.model_dump()))
 
 @router.delete("/experience/{exp_id}")
-def remove_experience(exp_id: int, session: Session = Depends(get_session)):
+def remove_experience(exp_id: int, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Delete an experience"""
     delete_experience(session, exp_id)
     return {"message": "Experience deleted"}
 
 @router.put("/experience/{exp_id}")
-def update_experience(exp_id: int, exp_data: ExperienceCreate, session: Session = Depends(get_session)):
+def update_experience(exp_id: int, exp_data: ExperienceCreate, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Update information of an experience"""
     experience = get_experience_by_id(session, exp_id)
     if not experience:
         raise HTTPException(status_code=404, detail="Experience not found")
@@ -194,16 +223,19 @@ def read_education_by_id(edu_id: int, session: Session = Depends(get_session)):
     return education
 
 @router.post("/education")
-def create_education(edu_data: EducationCreate, session: Session = Depends(get_session)):
+def create_education(edu_data: EducationCreate, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Create a new education"""
     return add_education(session, Education(**edu_data.model_dump()))
 
 @router.delete("/education/{edu_id}")
-def remove_education(edu_id: int, session: Session = Depends(get_session)):
+def remove_education(edu_id: int, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Delete an education"""
     delete_education(session, edu_id)
     return {"message": "Education deleted"}
 
 @router.put("/education/{edu_id}")
-def update_education(edu_id: int, edu_data: EducationCreate, session: Session = Depends(get_session)):
+def update_education(edu_id: int, edu_data: EducationCreate, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Update information of an education"""
     education = get_education_by_id(session, edu_id)
     if not education:
         raise HTTPException(status_code=404, detail="Education not found")
@@ -223,6 +255,8 @@ def read_project(project_id: int, session: Session = Depends(get_session)):
     project = get_project_by_id(session, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+    if project.image:
+        project.image = f"{BASE_URL}{project.image}"
     return project
 
 @router.post("/projects")
@@ -234,9 +268,10 @@ async def add_project(
     project_date: Optional[str] = Form(None),
     github_link: Optional[str] = Form(None),
     category: str = Form(...),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    valid_token: bool = Depends(verify_token)
     ):
-    """Thêm mới project và xử lý upload ảnh"""
+    """Add new Project"""
     project = Project(
         title=title,
         description=description,
@@ -277,9 +312,10 @@ async def update_project(
     project_date: Optional[str] = Form(None),
     github_link: Optional[str] = Form(None),
     category: str = Form(...),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    valid_token: bool = Depends(verify_token)
     ):
-    """Cập nhật thông tin project và xử lý upload ảnh"""
+    """Update info image and upload project"""
     project = get_project_by_id(session, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -316,7 +352,8 @@ async def update_project(
     }
 
 @router.delete("/projects/{project_id}")
-def remove_project(project_id: int, session: Session = Depends(get_session)):
+def remove_project(project_id: int, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Delete a project"""
     project = get_project_by_id(session, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -342,16 +379,19 @@ def read_skill(skill_id: int, session: Session = Depends(get_session)):
     return skill
 
 @router.post("/skills")
-def add_skill(skill: SkillCreate, session: Session = Depends(get_session)):
+def add_skill(skill: SkillCreate, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Create a new skill"""
     return create_skill(session, Skills(**skill.model_dump()))
 
 @router.delete("/skills/{skill_id}")
-def remove_skill(skill_id: int, session: Session = Depends(get_session)):
+def remove_skill(skill_id: int, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Delete a skill"""
     delete_skill(session, skill_id)
     return {"message": "Skill deleted"}
 
 @router.put("/skills/{skill_id}")
-def update_skill(skill_id: int, skill_data: SkillCreate, session: Session = Depends(get_session)):
+def update_skill(skill_id: int, skill_data: SkillCreate, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Update information of a skill"""
     skill = get_skill_by_id(session, skill_id)
     if not skill:
         raise HTTPException(status_code=404, detail="Skill not found")
@@ -360,3 +400,35 @@ def update_skill(skill_id: int, skill_data: SkillCreate, session: Session = Depe
     session.commit()
     session.refresh(skill)
     return skill
+# Login
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+@router.post("/login")
+def login(request: LoginCreate, session: Session = Depends(get_session)):
+    user = session.exec(select(Login).where(Login.username == request.username)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Username not found")
+    if not pwd_context.verify(request.password, user.password):
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
+    
+@router.put("/login")
+def update_login(request: LoginCreate,session: Session = Depends(get_session),valid_token: bool = Depends(verify_token)):
+    login = session.exec(select(Login)).first()
+    if not login:
+        raise HTTPException(status_code=404, detail="Login not found")
+    if request.password:
+        hashed_password = pwd_context.hash(request.password)
+        login.password = hashed_password
+    if request.username:
+        existing_user = session.exec(select(Login).where(Login.username == request.username)).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        login.username = request.username
+    session.commit()
+    return {"message": "Login updated successfully"}

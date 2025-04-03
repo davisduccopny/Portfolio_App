@@ -60,3 +60,7 @@ class SkillCreate(BaseModel):
     """Pydantic model for Skills"""
     skill: str
     percentage: int
+class LoginCreate(BaseModel):
+    """Pydantic model for login"""
+    username: str
+    password: str

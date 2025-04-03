@@ -70,3 +70,9 @@ class Education(SQLModel, table=True):
     school: str
     year: str
     description: str
+
+class Login(SQLModel,table=True):
+    """SQLModel class for the LoginRequest table"""
+    id: int = Field(default=None, primary_key=True)
+    username: str
+    password: str

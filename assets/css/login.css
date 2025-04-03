@@ -1,0 +1,55 @@
+body {
+    background: linear-gradient(to right, #141e30, #243b55);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+/* Thẻ card đăng nhập */
+.login-card {
+    width: 380px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+/* Tiêu đề */
+.login-card h3 {
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: #f8f9fa;
+}
+
+/* Ô input */
+.form-control {
+    background: #2a2e35;
+    border: 1px solid #495057;
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* Placeholder màu xám */
+.form-control::placeholder {
+    color: #adb5bd;
+}
+
+/* Button */
+.btn-login {
+    background-color: #007bff;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+    color: white;
+}
+
+/* Hover cho button */
+.btn-login:hover {
+    background-color: #0056b3;
+}
