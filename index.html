@@ -824,7 +824,7 @@
     
         // experience
         function fetchExperiences() {
-            fetch("http://localhost:8000/experience")
+            fetch("https://portfolio-app-jr52.onrender.com/experience")
                 .then(response => response.json())
                 .then(data => {
                     const experienceContainer = document.querySelector("#resume .row .col-lg-6[data-aos-delay='200']");
@@ -847,7 +847,7 @@
         
         // education
         function fetchEducation() {
-            fetch("http://localhost:8000/education")
+            fetch("https://portfolio-app-jr52.onrender.com/education")
                 .then(response => response.json())
                 .then(data => {
                     const educationContainer = document.querySelector("#resume .row .col-lg-6[data-aos-delay='100']");
@@ -880,7 +880,7 @@
         
         // projects
         function fetchProjects() {
-            fetch("http://localhost:8000/projects")
+            fetch("https://portfolio-app-jr52.onrender.com/projects")
                 .then(response => response.json())
                 .then(data => {
                     const projectContainer = document.querySelector(".portfolio .row");
@@ -908,7 +908,7 @@
         
         // skills
         function fetchAndUpdateSkills() {
-            fetch("http://localhost:8000/skills") 
+            fetch("https://portfolio-app-jr52.onrender.com/skills") 
                 .then(response => response.json())
                 .then(data => updateSkills(data))
                 .catch(error => console.error("Error loading skills:", error));
@@ -947,7 +947,7 @@
             return currentYear - birthYear;
         }
         function fetchProfile() {
-        fetch("http://localhost:8000/profile")  // API lấy profile
+        fetch("https://portfolio-app-jr52.onrender.com/profile")  // API lấy profile
             .then(response => response.json())
             .then(data => {
                     // Counter

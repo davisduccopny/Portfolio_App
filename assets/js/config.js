@@ -1,3 +1,3 @@
 const CONFIG = {
-    BASE_URL: "http://localhost:8000"  // Đổi thành URL thực khi deploy
+    BASE_URL: "https://portfolio-app-jr52.onrender.com"  // Đổi thành URL thực khi deploy
 };
