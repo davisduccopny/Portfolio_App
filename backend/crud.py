@@ -6,11 +6,6 @@ from models import Project, Profile, Experience, Education, Skills
 def get_profile(session: Session):
     return session.exec(select(Profile)).first()
 
-def update_profile(session: Session, profile_data: Profile):
-    session.add(profile_data)
-    session.commit()
-    session.refresh(profile_data)
-    return profile_data
 # Experience CRUD
 def get_experiences(session: Session):
     return session.exec(select(Experience)).all()
@@ -55,12 +50,6 @@ def get_all_projects(session: Session):
 
 def get_project_by_id(session: Session, project_id: int):
     return session.get(Project, project_id)
-
-def create_project(session: Session, project_data: Project):
-    session.add(project_data)
-    session.commit()
-    session.refresh(project_data)
-    return project_data
 
 def delete_project(session: Session, project_id: int):
     project = session.get(Project, project_id)

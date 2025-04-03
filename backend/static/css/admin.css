@@ -1,0 +1,6 @@
+/* Dark mode set */
+.dark-mode .note-editor { background: #222; color: white; border: 1px solid #444; }
+.dark-mode .note-toolbar { background: #333; border-bottom: 1px solid #444; }
+.dark-mode .note-editable { background: #222; color: white; }
+.dark-mode .note-btn { background: #444; color: white; }
+.dark-mode .note-btn:hover { background: #555; }
