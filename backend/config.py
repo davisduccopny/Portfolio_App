@@ -1,6 +1,6 @@
 import os
-BASE_URL = "http://localhost:8000"
-ORIGINS_URL = ["http://127.0.0.1:5500", "http://localhost:5500"]
+BASE_URL = os.environ.get("BASE_URL")
+ORIGINS_URL = [os.environ.get("ORIGINS_URL")]
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
