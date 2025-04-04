@@ -1,6 +1,9 @@
+from dotenv import load_dotenv
 import os
-BASE_URL = os.environ.get("BASE_URL")
-ORIGINS_URL = [os.environ.get("ORIGINS_URL")]
-SECRET_KEY = os.environ.get("SECRET_KEY")
+load_dotenv() 
+BASE_URL = os.getenv("BASE_URL")
+allowed_origins = os.getenv("ORIGINS_URL", "")
+ORIGINS_URL = [origin.strip() for origin in allowed_origins.split(",") if origin.strip()]
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
