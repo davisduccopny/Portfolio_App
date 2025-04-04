@@ -1,3 +1,4 @@
+import cloudinary.exceptions
 from fastapi import APIRouter, Depends, HTTPException,UploadFile, File, Form
 from sqlmodel import Session, select
 from database import get_session
@@ -6,7 +7,10 @@ from crud import get_education_by_id,get_experience_by_id,get_skill_by_id
 from models import Project,Profile, Experience, Education, Skills,Login
 from schemas import ProjectCreate,ProfileUpdate, ExperienceCreate, EducationCreate, SkillCreate,LoginCreate
 from typing import List, Optional,Union
-from config import BASE_URL, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from config import BASE_URL_IMAGE, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+import cloudinary.uploader
+from cloudinary.exceptions import NotFound
+from config import cloudinary
 
 import re
 import io
@@ -44,9 +48,9 @@ def read_profile(session: Session = Depends(get_session)):
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     if profile.avatar:  
-        profile.avatar = f"{BASE_URL}{profile.avatar}"
+        profile.avatar = f"{BASE_URL_IMAGE}{profile.avatar}"
     if profile.background:
-        profile.background = f"{BASE_URL}{profile.background}"
+        profile.background = f"{BASE_URL_IMAGE}{profile.background}"
     return profile
 
 UPLOAD_DIR = "static/uploads"
@@ -133,39 +137,36 @@ async def update_profile_info(
     profile.projects = projects
     profile.hours = hours
     profile.workers = workers
-
-    if not os.path.exists(UPLOAD_DIR):
-        os.makedirs(UPLOAD_DIR)
-    print(avatar.filename)
-    print(background.filename)
-    if avatar and avatar.filename != None and avatar.filename != "":
+ 
+    if avatar and avatar.filename != "":
         if profile.avatar:
-            old_avatar_path = profile.avatar.lstrip("/")
-            if os.path.exists(old_avatar_path):
-                os.remove(old_avatar_path)
+            try:
+                # Kiểm tra ảnh có tồn tại không trước khi xóa
+                cloudinary.api.resource(profile.avatar)
+                cloudinary.api.delete_resources([profile.avatar])
+            except NotFound:
+                print("Avatar không tồn tại trong Cloudinary, bỏ qua xóa.")
 
-        avatar_filename = f"{uuid.uuid4().hex}_{avatar.filename}"
-        avatar_path = os.path.join(UPLOAD_DIR, avatar_filename)
+        upload_result = cloudinary.uploader.upload(
+            avatar.file,
+            folder="portfolio/profile/"
+        )
+        profile.avatar = upload_result["public_id"]
 
-        with open(avatar_path, "wb") as f:
-            f.write(await avatar.read())
-
-        profile.avatar = f"/{UPLOAD_DIR}/{avatar_filename}"  # Lưu đường dẫn đúng
-
-    if background and background.filename != None and background.filename != "":
+    if background and background.filename != "":
         if profile.background:
-            old_background_path = profile.background.lstrip("/")
-            if os.path.exists(old_background_path):
-                os.remove(old_background_path)
+            try:
+                cloudinary.api.resource(profile.background)
+                cloudinary.api.delete_resources([profile.background])
+            except NotFound:
+                print("Background không tồn tại trong Cloudinary, bỏ qua xóa.")
 
-        background_filename = f"{uuid.uuid4().hex}_{background.filename}"
-        background_path = os.path.join(UPLOAD_DIR, background_filename)
-
-        with open(background_path, "wb") as f:
-            f.write(await background.read())
-
-        profile.background = f"/{UPLOAD_DIR}/{background_filename}" 
-
+        upload_result = cloudinary.uploader.upload(
+            background.file,
+            folder="portfolio/profile/"
+        )
+        profile.background = upload_result["public_id"]
+        
     session.add(profile)
     session.commit()
 
@@ -256,7 +257,7 @@ def read_project(project_id: int, session: Session = Depends(get_session)):
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     if project.image:
-        project.image = f"{BASE_URL}{project.image}"
+        project.image = f"{BASE_URL_IMAGE}{project.image}"
     return project
 
 @router.post("/projects")
@@ -281,17 +282,20 @@ async def add_project(
         category=category
     )
 
-    if image and image.filename:
-        if not os.path.exists(UPLOAD_DIR):
-            os.makedirs(UPLOAD_DIR)
+    if image and image.filename != "":
+        if project.image:
+            try:
+                # Kiểm tra ảnh có tồn tại không trước khi xóa
+                cloudinary.api.resource(project.image)
+                cloudinary.api.delete_resources([project.image])
+            except NotFound:
+                print("Image không tồn tại trong Cloudinary, bỏ qua xóa.")
 
-        image_filename = f"{uuid.uuid4().hex}_{image.filename}"
-        image_path = os.path.join(UPLOAD_DIR, image_filename)
-
-        with open(image_path, "wb") as f:
-            f.write(await image.read())
-
-        project.image = f"/{UPLOAD_DIR}/{image_filename}"  # Lưu đường dẫn ảnh
+        upload_result = cloudinary.uploader.upload(
+            image.file,
+            folder="portfolio/projects/"
+        )
+        project.image = upload_result["public_id"]
 
     session.add(project)
     session.commit()
@@ -328,20 +332,20 @@ async def update_project(
     project.github_link = github_link
     project.category = category
 
-    if image and image.filename:
-        if not os.path.exists(UPLOAD_DIR):
-            os.makedirs(UPLOAD_DIR)
+    if image and image.filename != "":
         if project.image:
-            old_image_path = project.image.lstrip("/")
-            if os.path.exists(old_image_path):
-                os.remove(old_image_path)
-        image_filename = f"{uuid.uuid4().hex}_{image.filename}"
-        image_path = os.path.join(UPLOAD_DIR, image_filename)
+            try:
+                # Kiểm tra ảnh có tồn tại không trước khi xóa
+                cloudinary.api.resource(project.image)
+                cloudinary.api.delete_resources([project.image])
+            except NotFound:
+                print("Image không tồn tại trong Cloudinary, bỏ qua xóa.")
 
-        with open(image_path, "wb") as f:
-            f.write(await image.read())
-
-        project.image = f"/{UPLOAD_DIR}/{image_filename}"  # Lưu đường dẫn ảnh mới
+        upload_result = cloudinary.uploader.upload(
+            image.file,
+            folder="portfolio/projects/"
+        )
+        project.image = upload_result["public_id"]
 
     session.commit()
     session.refresh(project)
@@ -358,11 +362,13 @@ def remove_project(project_id: int, session: Session = Depends(get_session), val
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # Xóa ảnh hiện có nếu tồn tại
+    # Xóa ảnh hiện có nếu tồn tại trên Cloudinary
     if project.image:
-        image_path = project.image.lstrip("/")
-        if os.path.exists(image_path):
-            os.remove(image_path)
+        try:
+            cloudinary.api.resource(project.image)
+            cloudinary.api.delete_resources([project.image])
+        except NotFound:
+            print("Image không tồn tại trong Cloudinary, bỏ qua xóa.")
     
     delete_project(session, project_id)
     return {"message": "Project deleted successfully"}

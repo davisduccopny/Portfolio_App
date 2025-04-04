@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from models import Project, Profile, Experience, Education, Skills
-from config import BASE_URL
+from config import BASE_URL_IMAGE
 
 # Profile CRUD
 def get_profile(session: Session):
@@ -49,7 +49,7 @@ def get_all_projects(session: Session):
     projects = session.exec(select(Project)).all()
     for project in projects:
         if project.image:
-            project.image = f"{BASE_URL}{project.image}"
+            project.image = f"{BASE_URL_IMAGE}{project.image}"
     return projects
 
 def get_project_by_id(session: Session, project_id: int):
