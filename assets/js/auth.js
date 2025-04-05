@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (response.ok) {
             localStorage.setItem("token", data.access_token);
             toast_show_success.show();
-            window.location.href = "/admin.html";
+            window.location.href = `${CONFIG.ADMIN_URL}`;
         } else {
             toast_show_error.show();
             console.error("Login failed:", data.message);

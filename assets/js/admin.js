@@ -4,7 +4,7 @@ const spinner = document.querySelector("#loadingSpinner");
 document.addEventListener("DOMContentLoaded", function () {
     token = localStorage.getItem("token");
     if (!token) {
-        window.location.href = "/login.html";
+        window.location.href = `${CONFIG.LOGIN_URL}`;
     } else {
         fetch(`${CONFIG.BASE_URL}/verify_token`, {
             method: 'POST',
@@ -14,11 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
         })
         .catch(error => {
-            window.location.href = "/login.html";
+            window.location.href = `${CONFIG.LOGIN_URL}`;
         });
     }
 });
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 if (response.status === 401) {
-                    window.location.href = "/login.html";
+                    window.location.href = `${CONFIG.LOGIN_URL}`;
                 }
                 const data = await response.json();
                 toast_show_success.show();
@@ -255,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
             response.json()
         })
@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
             response.json()
         })
@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
             response.json()
         }
@@ -417,7 +417,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     throw new Error(`Lỗi HTTP: ${response.status}`);
                 }
                 if (response.status === 401) {
-                    window.location.href = "/login.html";
+                    window.location.href = `${CONFIG.LOGIN_URL}`;
                 }
 
                 let result = await response.json();
@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
             response.json()
         })
@@ -594,7 +594,7 @@ function deleteSkill(skillId){
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
             if (response.ok) {
                 toast_show_success.show();
@@ -696,7 +696,7 @@ function deleteEducation(educationId){
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
             if (response.ok) {
                 toast_show_success.show();
@@ -812,7 +812,7 @@ function deleteProject(projectId){
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
             if (response.ok) {
                 toast_show_success.show();
@@ -919,7 +919,7 @@ function deleteExperience(experienceId){
         })
         .then(response => {
             if (response.status === 401) {
-                window.location.href = "/login.html";
+                window.location.href = `${CONFIG.LOGIN_URL}`;
             }
 
             if (response.ok) {
