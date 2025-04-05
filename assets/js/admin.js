@@ -1,5 +1,6 @@
 // Login set
 let token;
+const spinner = document.querySelector("#loadingSpinner");
 document.addEventListener("DOMContentLoaded", function () {
     token = localStorage.getItem("token");
     if (!token) {
@@ -157,6 +158,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector("#projectForm").addEventListener("submit", function (event) {
         async function ChangeProjectCommit(event) {
             event.preventDefault();
+            if (spinner) {
+                spinner.classList.remove("d-none");
+            }
             try {
                 let form = document.getElementById("projectForm");
                 const projectId = form.getAttribute("data-id");
@@ -207,12 +211,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Error:", error);
                 toast_show_error.show();
             }
+            finally {
+                if (spinner) {
+                    spinner.classList.add("d-none");
+                }
+            }
         }
 
         ChangeProjectCommit(event);
     });
     document.querySelector("#experienceForm").addEventListener("submit", function (event) {
         event.preventDefault();
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         const experienceId = this.getAttribute("data-id");
         const formData = new FormData(this);
 
@@ -258,10 +270,18 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.error("Error:", error);
             toast_show_error.show();
+        })
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
         });
     });
     document.querySelector("#educationForm").addEventListener("submit", function (event) {
         event.preventDefault();
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         const educationId = this.getAttribute("data-id");
         const formData = new FormData(this);
 
@@ -303,11 +323,18 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.error("Error:", error);
             toast_show_error.show();
+        })
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
         });
     });
     document.querySelector("#skillForm").addEventListener("submit", function (event) {
         event.preventDefault(); 
-
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         const skillId = this.getAttribute("data-id");
         const formData = new FormData(this);
 
@@ -345,11 +372,19 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.error("Error:", error);
             toast_show_error.show();
+        })
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
         });
     });
     document.querySelector("#profileForm").addEventListener("submit", function (event) {
         event.preventDefault(); 
         async function updateProfile() {
+            if (spinner) {
+                spinner.classList.remove("d-none");
+            }
             let form = document.getElementById("profileForm");
             let formData = new FormData(form);
 
@@ -393,12 +428,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Lỗi khi cập nhật profile:", error);
                 toast_show_error.show();
             }
+            finally {
+                if (spinner) {
+                    spinner.classList.add("d-none");
+                }
+            }
         }
         updateProfile();
 
     });
     document.querySelector("#LoginFormContainer").addEventListener("submit", function (event) {
         event.preventDefault();
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         let form = document.getElementById("LoginFormContainer");
         let formData = new FormData(form);
         let url = `${CONFIG.BASE_URL}/login`;
@@ -427,6 +470,11 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.error("Error:", error);
             toast_show_error.show();
+        })
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
         });
     });
     });
@@ -512,6 +560,9 @@ function fetchSkill() {
         .catch(error => console.error("Error loading skills:", error));
 }
 function showFormEditSkill(skillId) {
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
     fetch(`${CONFIG.BASE_URL}/skills/${skillId}`)
         .then(response => response.json())
         .then(data => {
@@ -525,10 +576,18 @@ function showFormEditSkill(skillId) {
             form.setAttribute("data-id", skillId);
             form.classList.remove("d-none");
         })
-        .catch(error => console.error("Error fetching skill:", error));
+        .catch(error => console.error("Error fetching skill:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
 }
 function deleteSkill(skillId){
     if (confirm("Are you sure you want to delete this skill?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         fetch(`${CONFIG.BASE_URL}/skills/${skillId}`, {
             method: "DELETE",
             headers: {'Authorization': `Bearer ${token}`}
@@ -550,6 +609,11 @@ function deleteSkill(skillId){
             toast_show_error.show();
             console.error("Error deleting skill:", error);
 
+        })
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
         });
     }
 }
@@ -592,6 +656,9 @@ function fetchEducation() {
         .catch(error => console.error("Error loading experiences:", error));
 }
 function showFormEditEducation(educationId) {
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
     fetch(`${CONFIG.BASE_URL}/education/${educationId}`)
         .then(response => response.json())
         .then(data => {
@@ -611,10 +678,18 @@ function showFormEditEducation(educationId) {
             form.setAttribute("data-id", educationId);
             form.classList.remove("d-none");
         })
-        .catch(error => console.error("Error fetching education:", error));
+        .catch(error => console.error("Error fetching education:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
 }
 function deleteEducation(educationId){
     if (confirm("Are you sure you want to delete this education?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         fetch(`${CONFIG.BASE_URL}/education/${educationId}`, {
             method: "DELETE",
             headers: {'Authorization': `Bearer ${token}`}
@@ -634,7 +709,13 @@ function deleteEducation(educationId){
         })
         .catch(error => {
             toast_show_error.show()
-            console.error("Error deleting education:", error);});
+            console.error("Error deleting education:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+
     }
 }
 function fetchProjects() {
@@ -679,7 +760,6 @@ function fetchProjects() {
         .catch(error => console.error("Error loading experiences:", error));
 }
 function showFormEditProject(projectId) {
-    const spinner = document.querySelector("#loadingSpinner");
     // Hiển thị spinner trước khi gọi API
     if (spinner) {
         spinner.classList.remove("d-none");
@@ -697,7 +777,7 @@ function showFormEditProject(projectId) {
                         }
                     } 
                     else if (input.type === "file"){
-                        document.getElementById("projectImagePreview").src = "." + data.image;
+                        document.getElementById("projectImagePreview").src =data.image;
                     }
                     else if (input.tagName.toLowerCase() === "select") {
                         // Nếu input là <select>, gán giá trị vào select
@@ -723,6 +803,9 @@ function showFormEditProject(projectId) {
 }
 function deleteProject(projectId){
     if (confirm("Are you sure you want to delete this projects?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         fetch(`${CONFIG.BASE_URL}/projects/${projectId}`, {
             method: "DELETE",
             headers: {'Authorization': `Bearer ${token}`}
@@ -741,7 +824,12 @@ function deleteProject(projectId){
         })
         .catch(error => {
             toast_show_error.show()
-            console.error("Error deleting projects:", error);});
+            console.error("Error deleting projects:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
     }
 }
 function fetchExperiences() {
@@ -784,7 +872,6 @@ function fetchExperiences() {
         .catch(error => console.error("Error loading experiences:", error));
 }
 function showFormEditExperience(experienceId) {
-    const spinner = document.querySelector("#loadingSpinner");
     // Hiển thị spinner trước khi gọi API
     if (spinner) {
         spinner.classList.remove("d-none");
@@ -823,6 +910,9 @@ function showFormEditExperience(experienceId) {
 }
 function deleteExperience(experienceId){
     if (confirm("Are you sure you want to delete this experience?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         fetch(`${CONFIG.BASE_URL}/experience/${experienceId}`, {
             method: "DELETE",
             headers: {'Authorization': `Bearer ${token}`}
@@ -842,7 +932,12 @@ function deleteExperience(experienceId){
         })
         .catch(error => {
             toast_show_error.show();
-            console.error("Error deleting experience:", error);});
+            console.error("Error deleting experience:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
     }
 }
 function displayImage(input, previewId) {

@@ -3,9 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
     toast_show_success = new bootstrap.Toast(toastSuccess);
     const toastError = document.getElementById("toastError");
     toast_show_error = new bootstrap.Toast(toastError);
+    const spinner = document.querySelector("#loadingSpinner");
     document.getElementById("loginForm").addEventListener("submit", async function (event) {
         event.preventDefault();
-
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
         let username = document.getElementById("username").value;
         let password = document.getElementById("password").value;
 
@@ -24,6 +27,9 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             toast_show_error.show();
             console.error("Login failed:", data.message);
+        }
+        if (spinner) {
+            spinner.classList.add("d-none");
         }
     });
 });
