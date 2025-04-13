@@ -1,20 +1,46 @@
-// Login set
-let token;
+// Author: Hoang Xuan Quoc
+// ---- SET CONFIG ----
+let SETUP_SECURE ={
+    token: '',
+}
+let PAGINATION = {
+    currentPage_blogs: 1,
+    currentPage_testimonials: 1,
+    currentPage_contact: 1,
+    currentPage_experience: 1,
+    currentPage_education: 1,
+    currentPage_projects: 1,
+    currentPage_skills: 1,
+}
 const spinner = document.querySelector("#loadingSpinner");
+const PAGESIZE = {
+    blogs: 5,
+    testimonials: 5,
+    contact: 5,
+    experience: 5,
+    education: 5,
+    projects: 5,
+    skills: 5,
+}
+// ---- CONFIG LOGIN ----
+
 document.addEventListener("DOMContentLoaded", function () {
-    token = localStorage.getItem("token");
-    if (!token) {
+    SETUP_SECURE.token = localStorage.getItem("token_authorized_admin");
+    if (!SETUP_SECURE.token) {
         window.location.href = `${CONFIG.LOGIN_URL}`;
     } else {
         fetch(`${CONFIG.BASE_URL}/verify_token`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${SETUP_SECURE.token}`
             }
         })
         .then(response => {
             if (response.status === 401) {
                 window.location.href = `${CONFIG.LOGIN_URL}`;
+            }
+            else{
+                document.body.style.display = "block";
             }
         })
         .catch(error => {
@@ -23,7 +49,48 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Change theme
+// ---- SET PAGESIZE CHANGE----
+const setupPageSizeChange = (id, key, fetchFunction) => {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener("change", function () {
+            const selectedValue = parseInt(this.value);
+            PAGESIZE[key] = selectedValue;
+            PAGINATION[`currentPage_${key}`] = 1;
+            fetchFunction();
+        });
+    }
+};
+
+setupPageSizeChange("select-page-size-blogs", "blogs", fetchBlogs);
+setupPageSizeChange("select-page-size-testimonials", "testimonials", fetchTestimonials);
+setupPageSizeChange("select-page-size-contacts", "contact", fetchContactForm);
+setupPageSizeChange("select-page-size-experiences", "experience", fetchExperiences);
+setupPageSizeChange("select-page-size-educations", "education", fetchEducation);
+setupPageSizeChange("select-page-size-projects", "projects", fetchProjects);
+setupPageSizeChange("select-page-size-skills", "skills", fetchSkill);
+
+// ---- SET FETCH WITH RETRY----
+
+function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
+    return fetch(url, options).then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    }).catch(error => {
+        if (retries > 0) {
+            console.warn(`Retrying... (${3 - retries + 1})`, error);
+            return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
+                fetchWithRetry(url, options, retries - 1, delay)
+            );
+        } else {
+            console.error("All retries failed:", error);
+            throw error;
+        }
+    });
+}
+// ---- SET THEME ----
 document.addEventListener("DOMContentLoaded", function() {
     document.body.classList.add('dark-mode');
     document.getElementById("toggleTheme").addEventListener("click", function() {
@@ -42,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
-// Congig navigation
+// ---- SET ACTIVE NAVBAR ----
 document.addEventListener("DOMContentLoaded", function () {
     const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
     const forms = document.querySelectorAll(".admin-form");
@@ -69,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-// Toggle form
+// ---- SET FORM ADD ----
 document.addEventListener("DOMContentLoaded", function () {
 // Xử lý nút Add để hiển thị form
     document.querySelectorAll(".add-form").forEach(button => {
@@ -121,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
-// Get data and config summernote
+// ---- SET FORM ACTION ----
 let toast_show_success;
 let toast_show_error;
 document.addEventListener("DOMContentLoaded", function () {
@@ -131,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const toastError = document.getElementById("toastError");
     toast_show_error = new bootstrap.Toast(toastError);
     // Define textarea
-    const textAreas = ["about", "sumary", "des_about_1", "des_about_2", "des_about_3", "des_about_4", "description_edu", "description_project", "description_experience"];
+    const textAreas = ["about", "sumary", "des_about_1", "des_about_2", "des_about_3", "des_about_4", "description_edu", "description_project", "description_experience","body_blog_text"];
     textAreas.forEach(id => {
         $(`#${id}`).summernote({
             placeholder: 'Write here...',
@@ -139,12 +206,21 @@ document.addEventListener("DOMContentLoaded", function () {
             height: 100,
             toolbar: [
                 ['style', ['bold', 'italic', 'underline', 'strikethrough', 'clear']], 
-                ['font', ['fontname', 'fontsize', 'color']], 
-                ['para', ['ul', 'ol', 'paragraph', 'align']], 
+                ['font', ['fontname', 'fontsize', 'color','forecolor','backcolor']], 
+                ['para', ['ul', 'ol', 'paragraph', 'align', 'height']], 
                 ['insert', ['link', 'picture', 'video', 'hr']],  
                 ['table', ['table']],  
-                ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']]  
-            ]
+                ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
+            ],
+            callbacks: {
+                onPaste: function(e) {
+                    setTimeout(() => {
+                      document.querySelectorAll('.note-editable img').forEach(img => {
+                        img.classList.add('img-fluid');
+                      });
+                    }, 100);
+                  }
+            }
 
         });
     });
@@ -154,6 +230,9 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchProjects();
     fetchExperiences();
     getDataAPiProfile();
+    fetchContactForm();
+    fetchTestimonials();
+    fetchBlogs();
 
     document.querySelector("#projectForm").addEventListener("submit", function (event) {
         async function ChangeProjectCommit(event) {
@@ -188,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: method,
                     body: formData,
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${SETUP_SECURE.token}`
                     }
                 });
 
@@ -220,6 +299,123 @@ document.addEventListener("DOMContentLoaded", function () {
 
         ChangeProjectCommit(event);
     });
+    document.querySelector("#BlogsForm",).addEventListener("submit", function (event) {
+        async function changeBlogsSubmit(event){
+            event.preventDefault();
+            if (spinner){
+                spinner.classList.remove("d-none");
+            }
+            try {
+                let form = document.getElementById("BlogsForm");
+                const BlogId = form.getAttribute("data-id");
+                let url = `${CONFIG.BASE_URL}/blogs`;
+                let method = "POST";
+
+                if (BlogId) {
+                    url = `${CONFIG.BASE_URL}/blogs/${BlogId}`;
+                    method = "PUT";
+                }
+                const formData = new FormData(form);
+                let imageFile = document.querySelector("[name='image']").files[0];
+                if (imageFile) {
+                    formData.append("image", imageFile);
+                }
+                const textAreas = ["body_blog_text"];
+                textAreas.forEach(id => {
+                    if ($(`#${id}`).summernote) {
+                        formData.append(id, $(`#${id}`).summernote('code'));
+                    }
+                });
+
+                // Gửi request
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${SETUP_SECURE.token}`
+                    }
+                });
+
+                // Kiểm tra nếu request thất bại
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                if (response.status === 401) {
+                    window.location.href = `${CONFIG.LOGIN_URL}`;
+                }
+                const data = await response.json();
+                toast_show_success.show();
+                fetchBlogs(PAGINATION.currentPage_blogs);
+                form.reset();
+                form.classList.add("d-none");
+                form.removeAttribute("data-id");
+
+            } catch (error) {
+                console.error("Error:", error);
+                toast_show_error.show();
+            }
+            finally {
+                if (spinner) {
+                    spinner.classList.add("d-none");
+                }
+            }
+        }
+
+        changeBlogsSubmit(event);
+    });
+    
+    document.querySelector("#testimonialForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
+        const testimonialId = this.getAttribute("data-id");
+        const formData = new FormData(this);
+
+        let url = `${CONFIG.BASE_URL}/testimonials`;
+        let method = "POST"; 
+
+        if (testimonialId) {
+            url = `${CONFIG.BASE_URL}/testimonials/${testimonialId}`;
+            method = "PUT"; 
+        }
+        let imageFile = document.querySelector("[name='image']").files[0];
+        if (imageFile) {
+            formData.append("image", imageFile);
+        }
+
+        fetch(url, {
+            method: method,
+            body: formData,
+            headers: { 
+                'Authorization': `Bearer ${SETUP_SECURE.token}`
+             }
+        })
+        .then(response => {
+            if (response.status === 401) {
+                window.location.href = `${CONFIG.LOGIN_URL}`;
+            }
+            response.json()
+        })
+        .then(data => {
+            toast_show_success.show();
+            console.log("Success:", data)
+            fetchTestimonials();
+            this.reset(); 
+            this.classList.add("d-none"); 
+            this.removeAttribute("data-id");
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            toast_show_error.show();
+        })
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+    });
+
     document.querySelector("#experienceForm").addEventListener("submit", function (event) {
         event.preventDefault();
         if (spinner) {
@@ -250,7 +446,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(Object.fromEntries(formData)),
             headers: { 
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${SETUP_SECURE.token}`
              },
         })
         .then(response => {
@@ -303,7 +499,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(Object.fromEntries(formData)),
             headers: { 
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${SETUP_SECURE.token}`
              }
         })
         .then(response => {
@@ -351,7 +547,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(Object.fromEntries(formData)),
             headers: { 
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${SETUP_SECURE.token}`
              }
         })
         .then(response => {
@@ -409,7 +605,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: "PUT",
                     body: formData,
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${SETUP_SECURE.token}`
                     }
                 });
 
@@ -451,7 +647,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(Object.fromEntries(formData)),
             headers: { 
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${SETUP_SECURE.token}`
              }
         })
         .then(response => {
@@ -477,18 +673,18 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
-    });
+});
+// ---- SET FETCH DATA,SHOW FORM FOR EDIT AND DELETE ITEM ----
+// PROFILE
 function getDataAPiProfile(){
     const textAreas = ["about", "sumary", "des_about_1", "des_about_2", "des_about_3", "des_about_4"];
     const apiUrl = `${CONFIG.BASE_URL}/profile`;  
-    fetch(apiUrl)
-        .then(response => response.json())
+    fetchWithRetry(apiUrl)
         .then(data => {
             fillProfileForm(data,textAreas);
         })
-        .catch(error => console.error("Lỗi khi lấy dữ liệu profile:", error));
+        .catch(error => console.error("Error after retry:", error));
 }
-    
 function fillProfileForm(data,textAreas) {
     const form = document.getElementById("profileForm");
     if (!form) {
@@ -522,13 +718,20 @@ function fillProfileForm(data,textAreas) {
     });
     
 }
-function fetchSkill() {
-    fetch(`${CONFIG.BASE_URL}/skills`)
-        .then(response => response.json())
+// SKILLS
+function fetchSkill(page = PAGINATION.currentPage_skills) {
+    const limit = PAGESIZE.skills;
+    const offset = limit > 0 ? (page - 1) * limit : 0;
+
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/skills?limit=${limit}&offset=${offset}`)
         .then(data => {
+            const skills = data.skills;
             const skillContainer = document.querySelector(".table-skill-fech tbody");
             let content = "";
-            data.forEach(skill => {
+            skills.forEach(skill => {
                 content += `
                 <tr>
                     <td>${skill.id}</td>
@@ -556,8 +759,38 @@ function fetchSkill() {
                     deleteSkill(skillId);
                 });
             });
+
+            // Cập nhật phân trang
+            if (PAGESIZE.skills == 0) {
+                renderPagination(
+                    "pagination-skills",
+                    data.total,
+                    page,
+                    data.total,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_skills = selectedPage;
+                        fetchSkill(selectedPage);
+                    }
+                );
+            } else {
+                renderPagination(
+                    "pagination-skills",
+                    data.total,
+                    page,
+                    PAGESIZE.skills,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_skills = selectedPage;
+                        fetchSkill(selectedPage);
+                    }
+                );
+            }
         })
-        .catch(error => console.error("Error loading skills:", error));
+        .catch(error => console.error("Error loading skills after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
 }
 function showFormEditSkill(skillId) {
     if (spinner) {
@@ -590,7 +823,7 @@ function deleteSkill(skillId){
         }
         fetch(`${CONFIG.BASE_URL}/skills/${skillId}`, {
             method: "DELETE",
-            headers: {'Authorization': `Bearer ${token}`}
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
         })
         .then(response => {
             if (response.status === 401) {
@@ -617,13 +850,20 @@ function deleteSkill(skillId){
         });
     }
 }
-function fetchEducation() {
-    fetch(`${CONFIG.BASE_URL}/education`)
-        .then(response => response.json())
+// EDUCATION
+function fetchEducation(page = PAGINATION.currentPage_education) {
+    const limit = PAGESIZE.education;
+    const offset = limit > 0 ? (page - 1) * limit : 0;
+
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/education?limit=${limit}&offset=${offset}`)
         .then(data => {
+            const educations = data.education;
             const EducationContainer = document.querySelector(".table-education-fech tbody");
             let content = "";
-            data.forEach(education => {
+            educations.forEach(education => {
                 content += `
                 <tr>
                     <td>${education.id}</td>
@@ -638,7 +878,8 @@ function fetchEducation() {
                 </tr>
                 `;
             });
-            EducationContainer.innerHTML =content;
+            EducationContainer.innerHTML = content;
+
             // Gán sự kiện khi click vào nút Edit
             document.querySelectorAll(".btn-edit-education").forEach(button => {
                 button.addEventListener("click", function () {
@@ -652,8 +893,38 @@ function fetchEducation() {
                     deleteEducation(educationId);
                 });
             });
+
+            // Cập nhật phân trang
+            if (PAGESIZE.education == 0) {
+                renderPagination(
+                    "pagination-educations",
+                    data.total,
+                    page,
+                    data.total,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_education = selectedPage;
+                        fetchEducation(selectedPage);
+                    }
+                );
+            } else {
+                renderPagination(
+                    "pagination-educations",
+                    data.total,
+                    page,
+                    PAGESIZE.education,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_education = selectedPage;
+                        fetchEducation(selectedPage);
+                    }
+                );
+            }
         })
-        .catch(error => console.error("Error loading experiences:", error));
+        .catch(error => console.error("Error loading education after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
 }
 function showFormEditEducation(educationId) {
     if (spinner) {
@@ -692,7 +963,7 @@ function deleteEducation(educationId){
         }
         fetch(`${CONFIG.BASE_URL}/education/${educationId}`, {
             method: "DELETE",
-            headers: {'Authorization': `Bearer ${token}`}
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
         })
         .then(response => {
             if (response.status === 401) {
@@ -718,31 +989,39 @@ function deleteEducation(educationId){
 
     }
 }
-function fetchProjects() {
-    fetch(`${CONFIG.BASE_URL}/projects`)
-        .then(response => response.json())
+// PROJECTS
+function fetchProjects(page = PAGINATION.currentPage_projects) {
+    const limit = PAGESIZE.projects;
+    const offset = limit > 0 ? (page - 1) * limit : 0;
+
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/projects?limit=${limit}&offset=${offset}`)
         .then(data => {
+            const projects = data.projects;
             const ProjectsContainer = document.querySelector(".table-projects-fech tbody");
             let content = "";
-            data.forEach(projects => {
+            projects.forEach(project => {
                 content += `
                 <tr>
-                    <td>${projects.id}</td>
-                    <td>${projects.title.substring(0, 50)}</td>
-                    <td>${projects.description.substring(0, 50)}</td>
-                    <td><img src="${projects.image}" width="100" height="100"></td>
-                    <td>${projects.project_date}</td>
-                    <td>${projects.category}</td>
-                    <td>${projects.client}</td>
-                    <td>${projects.github_link}</td>
+                    <td>${project.id}</td>
+                    <td>${project.title.substring(0, 50)}</td>
+                    <td>${project.description.substring(0, 50)}</td>
+                    <td><img src="${project.image}" width="100" height="100" class="img-fluid"></td>
+                    <td>${project.project_date}</td>
+                    <td>${project.category}</td>
+                    <td>${project.client}</td>
+                    <td>${project.github_link}</td>
                     <td>
-                        <button class="btn btn-warning btn-sm me-2 mb-2 btn-edit-project" data-target-id ="${projects.id}"><i class="fa fa-edit"></i> Edit</button>
-                        <button class="btn btn-danger btn-sm mb-2 btn-delete-project" data-target-id ="${projects.id}"><i class="fa fa-trash"></i> Delete</button>
+                        <button class="btn btn-warning btn-sm me-2 mb-2 btn-edit-project" data-target-id="${project.id}"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger btn-sm mb-2 btn-delete-project" data-target-id="${project.id}"><i class="fa fa-trash"></i> Delete</button>
                     </td>
                 </tr>
                 `;
             });
-            ProjectsContainer.innerHTML =content;
+            ProjectsContainer.innerHTML = content;
+
             // Gán sự kiện khi click vào nút Edit
             document.querySelectorAll(".btn-edit-project").forEach(button => {
                 button.addEventListener("click", function () {
@@ -756,8 +1035,38 @@ function fetchProjects() {
                     deleteProject(projectId);
                 });
             });
+
+            // Cập nhật phân trang
+            if (PAGESIZE.projects == 0) {
+                renderPagination(
+                    "pagination-projects",
+                    data.total,
+                    page,
+                    data.total,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_projects = selectedPage;
+                        fetchProjects(selectedPage);
+                    }
+                );
+            } else {
+                renderPagination(
+                    "pagination-projects",
+                    data.total,
+                    page,
+                    PAGESIZE.projects,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_projects = selectedPage;
+                        fetchProjects(selectedPage);
+                    }
+                );
+            }
         })
-        .catch(error => console.error("Error loading experiences:", error));
+        .catch(error => console.error("Error loading projects after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
 }
 function showFormEditProject(projectId) {
     // Hiển thị spinner trước khi gọi API
@@ -808,7 +1117,7 @@ function deleteProject(projectId){
         }
         fetch(`${CONFIG.BASE_URL}/projects/${projectId}`, {
             method: "DELETE",
-            headers: {'Authorization': `Bearer ${token}`}
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
         })
         .then(response => {
             if (response.status === 401) {
@@ -832,13 +1141,20 @@ function deleteProject(projectId){
         });
     }
 }
-function fetchExperiences() {
-    fetch(`${CONFIG.BASE_URL}/experience`)
-        .then(response => response.json())
+// EXPERIENCES
+function fetchExperiences(page = PAGINATION.currentPage_experience) {
+    const limit = PAGESIZE.experience;
+    const offset = limit > 0 ? (page - 1) * limit : 0;
+
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/experience?limit=${limit}&offset=${offset}`)
         .then(data => {
+            const experiences = data.experiences;
             const ExperienceContainer = document.querySelector(".table-experience-fech tbody");
             let content = "";
-            data.forEach(experience => {
+            experiences.forEach(experience => {
                 content += `
                 <tr>
                     <td>${experience.id}</td>
@@ -854,7 +1170,8 @@ function fetchExperiences() {
                 </tr>
                 `;
             });
-            ExperienceContainer.innerHTML =content;
+            ExperienceContainer.innerHTML = content;
+
             // Gán sự kiện khi click vào nút Edit
             document.querySelectorAll(".btn-edit-experience").forEach(button => {
                 button.addEventListener("click", function () {
@@ -868,8 +1185,38 @@ function fetchExperiences() {
                     deleteExperience(experienceId);
                 });
             });
+
+            // Cập nhật phân trang
+            if (PAGESIZE.experience == 0) {
+                renderPagination(
+                    "pagination-experiences",
+                    data.total,
+                    page,
+                    data.total,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_experience = selectedPage;
+                        fetchExperiences(selectedPage);
+                    }
+                );
+            } else {
+                renderPagination(
+                    "pagination-experiences",
+                    data.total,
+                    page,
+                    PAGESIZE.experience,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_experience = selectedPage;
+                        fetchExperiences(selectedPage);
+                    }
+                );
+            }
         })
-        .catch(error => console.error("Error loading experiences:", error));
+        .catch(error => console.error("Error loading experiences after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
 }
 function showFormEditExperience(experienceId) {
     // Hiển thị spinner trước khi gọi API
@@ -915,7 +1262,7 @@ function deleteExperience(experienceId){
         }
         fetch(`${CONFIG.BASE_URL}/experience/${experienceId}`, {
             method: "DELETE",
-            headers: {'Authorization': `Bearer ${token}`}
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
         })
         .then(response => {
             if (response.status === 401) {
@@ -940,6 +1287,431 @@ function deleteExperience(experienceId){
         });
     }
 }
+// CONTACTS FORM
+function fetchContactForm(page = PAGINATION.currentPage_contact) {
+    const limit = PAGESIZE.contact;
+    const offset = limit > 0 ? (page - 1) * limit : 0;
+
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/contact?limit=${limit}&offset=${offset}`)
+        .then(data => {
+            const contacts = data.contact_forms;
+            const contactContainer = document.querySelector(".table-contactForm-fech tbody");
+            let content = "";
+            contacts.forEach(contact => {
+                content += `
+                <tr>
+                    <td>${contact.id}</td>
+                    <td>${contact.name}</td>
+                    <td>${contact.email}</td>
+                    <td>${contact.subject}</td>
+                    <td>${contact.message.substring(0, 50)}...</td>
+                    <td>${contact.created_at}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2 mb-2 btn-show-contact" data-target-id ="${contact.id}"><i class="fa fa-edit"></i> Show</button>
+                        <button class="btn btn-danger btn-sm mb-2 btn-delete-contact" data-target-id ="${contact.id}"><i class="fa fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+                `;
+            });
+            contactContainer.innerHTML = content;
+
+            // Gán sự kiện khi click vào nút Show/Delete
+            document.querySelectorAll(".btn-show-contact").forEach(button => {
+                button.addEventListener("click", function () {
+                    const contactId = this.getAttribute("data-target-id");
+                    showFormContact(contactId);
+                });
+            });
+            document.querySelectorAll(".btn-delete-contact").forEach(button => {
+                button.addEventListener("click", function () {
+                    const contactId = this.getAttribute("data-target-id");
+                    deleteContact(contactId);
+                });
+            });
+
+            // Cập nhật phân trang
+            if (PAGESIZE.contact == 0) {
+                renderPagination(
+                    "pagination-contacts",
+                    data.total,
+                    page,
+                    data.total,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_contact = selectedPage;
+                        fetchContactForm(selectedPage);
+                    }
+                );
+            } else {
+                renderPagination(
+                    "pagination-contacts",
+                    data.total,
+                    page,
+                    PAGESIZE.contact,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_contact = selectedPage;
+                        fetchContactForm(selectedPage);
+                    }
+                );
+            }
+        })
+        .catch(error => console.error("Error loading contact after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function showFormContact(contactId) {
+    // Hiển thị spinner trước khi gọi API
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetch(`${CONFIG.BASE_URL}/contact/${contactId}`)
+        .then(response => response.json())
+        .then(data => {
+            const contactDetailsContainer = document.querySelector("#contactDetailsContainer");
+            if (contactDetailsContainer) {
+                contactDetailsContainer.querySelector("#contactName").textContent = data.name || "";
+                contactDetailsContainer.querySelector("#contactEmail").textContent = data.email || "";
+                contactDetailsContainer.querySelector("#contactSubject").textContent = data.subject || "";
+                contactDetailsContainer.querySelector("#contactMessage").textContent = data.message || "";
+                contactDetailsContainer.querySelector("#contactCreatedDate").textContent = data.created_at || "";
+                contactDetailsContainer.setAttribute("data-id", contactId);
+                contactDetailsContainer.classList.remove("d-none");
+            }
+        })
+        .catch(error => console.error("Error fetching contact:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function deleteContact(contactId){
+    if (confirm("Are you sure you want to delete this contact?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
+        fetch(`${CONFIG.BASE_URL}/contact/${contactId}`, {
+            method: "DELETE",
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
+        })
+        .then(response => {
+            if (response.status === 401) {
+                window.location.href = `${CONFIG.LOGIN_URL}`;
+            }
+            if (response.ok) {
+                toast_show_success.show();
+                fetchContactForm(); 
+            } else {
+                toast_show_error.show();
+                console.error("Error deleting contact:", response.statusText);
+            }
+            
+        })
+        .catch(error => {
+            toast_show_error.show()
+            console.error("Error deleting contact:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+    }
+}
+// TESTIMONIALS
+function fetchTestimonials(page = PAGINATION.currentPage_testimonials) {
+    const limit = PAGESIZE.testimonials;
+    const offset = limit > 0 ? (page - 1) * limit : 0;
+
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/testimonials?limit=${limit}&offset=${offset}`)
+        .then(data => {
+            const testimonials = data.testimonials;
+            const testimonialsContainer = document.querySelector(".table-testimonials-fech tbody");
+            let content = "";
+            testimonials.forEach(testimonial => {
+                content += `
+                <tr>
+                    <td>${testimonial.id}</td>
+                    <td>${testimonial.name.substring(0, 50)}</td>
+                    <td>${testimonial.position.substring(0, 50)}</td>
+                    <td>${testimonial.company.substring(0, 50)}</td>
+                    <td>${testimonial.description.substring(0, 50)}...</td>
+                    <td><img src="${testimonial.image}" width="100" height="100" class="img-fluid"></td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2 mb-2 btn-edit-testimonial" data-target-id ="${testimonial.id}"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger btn-sm mb-2 btn-delete-testimonial" data-target-id ="${testimonial.id}"><i class="fa fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+                `;
+            });
+            testimonialsContainer.innerHTML = content;
+
+            // Gán sự kiện khi click vào nút Edit/Delete
+            document.querySelectorAll(".btn-edit-testimonial").forEach(button => {
+                button.addEventListener("click", function () {
+                    const testimonialId = this.getAttribute("data-target-id");
+                    showFormEditTestimonial(testimonialId);
+                });
+            });
+            document.querySelectorAll(".btn-delete-testimonial").forEach(button => {
+                button.addEventListener("click", function () {
+                    const testimonialId = this.getAttribute("data-target-id");
+                    deleteTestimonial(testimonialId);
+                });
+            });
+
+            // Cập nhật phân trang
+            if (PAGESIZE.testimonials == 0) {
+                renderPagination(
+                    "pagination-testimonials",
+                    data.total,
+                    page,
+                    data.total,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_testimonials = selectedPage;
+                        fetchTestimonials(selectedPage);
+                    }
+                );
+            } else {
+                renderPagination(
+                    "pagination-testimonials",
+                    data.total,
+                    page,
+                    PAGESIZE.testimonials,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_testimonials = selectedPage;
+                        fetchTestimonials(selectedPage);
+                    }
+                );
+            }
+        })
+        .catch(error => console.error("Error loading testimonials after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function showFormEditTestimonial(testimonialId) {
+    // Hiển thị spinner trước khi gọi API
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetch(`${CONFIG.BASE_URL}/testimonials/${testimonialId}`)
+        .then(response => response.json())
+        .then(data => {
+            const form = document.querySelector("#testimonialForm");
+            Object.keys(data).forEach(key => {
+                let input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                        if (key === "image" && data.image) {
+                            document.getElementById("testimonialImagePreview").src =data.image;
+                        } else {
+                            input.value = data[key];
+                        }
+                }
+            });
+            form.setAttribute("data-id", testimonialId);
+            form.classList.remove("d-none");
+        })
+        .catch(error => console.error("Error fetching testimonial:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function deleteTestimonial(testimonialId){
+    if (confirm("Are you sure you want to delete this testimonial?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
+        fetch(`${CONFIG.BASE_URL}/testimonials/${testimonialId}`, {
+            method: "DELETE",
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
+        })
+        .then(response => {
+            if (response.status === 401) {
+                window.location.href = `${CONFIG.LOGIN_URL}`;
+            }
+            if (response.ok) {
+                toast_show_success.show();
+                fetchTestimonials(); 
+            } else {
+                toast_show_error.show();
+                console.error("Error deleting testimonial:", response.statusText);
+            }
+            
+        })
+        .catch(error => {
+            toast_show_error.show()
+            console.error("Error deleting testimonial:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+    }
+}
+// BLOGS
+function fetchBlogs(page = PAGINATION.currentPage_blogs) {
+    const limit = PAGESIZE.blogs;
+    const offset = limit > 0 ? (page - 1) * limit : 0;
+
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/blogs?limit=${limit}&offset=${offset}`)
+        .then(data => {
+            const blogs = data.blogs;
+            const blogsContainer = document.querySelector(".table-blogs-fech tbody");
+            let content = "";
+            blogs.forEach(blog => {
+                content += `
+                <tr>
+                    <td>${blog.id}</td>
+                    <td>${blog.title.substring(0, 50)}</td>
+                    <td><img src="${blog.image}" width="100" height="100" class="img-fluid"></td>
+                    <td>${blog.category}</td>
+                    <td>${blog.description.substring(0, 50)}</td>
+                    <td>${blog.created_at}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2 mb-2 btn-edit-blogs" data-target-id="${blog.id}"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger btn-sm mb-2 btn-delete-blogs" data-target-id="${blog.id}"><i class="fa fa-trash"></i> Delete</button>
+                    </td>
+                </tr>`;
+            });
+            blogsContainer.innerHTML = content;
+
+            // Gán sự kiện Edit/Delete
+            document.querySelectorAll(".btn-edit-blogs").forEach(button => {
+                button.addEventListener("click", function () {
+                    const blogsId = this.getAttribute("data-target-id");
+                    showFormEditBlogs(blogsId);
+                });
+            });
+            document.querySelectorAll(".btn-delete-blogs").forEach(button => {
+                button.addEventListener("click", function () {
+                    const blogsId = this.getAttribute("data-target-id");
+                    deleteBlogs(blogsId);
+                });
+            });
+
+            // Cập nhật phân trang
+            if (PAGESIZE.blogs == 0){
+                renderPagination(
+                    "pagination-blogs",
+                    data.total,
+                    page,
+                    data.total,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_blogs = selectedPage;
+                        fetchBlogs(selectedPage);
+                    }
+                );
+            }
+            else{
+                renderPagination(
+                    "pagination-blogs",
+                    data.total,
+                    page,
+                    PAGESIZE.blogs,
+                    (selectedPage) => {
+                        PAGINATION.currentPage_blogs = selectedPage;
+                        fetchBlogs(selectedPage);
+                    }
+                );
+            }
+            
+            if (spinner){
+                spinner.classList.add("d-none");
+            }
+        })
+        .catch(error => console.error("Error loading blogs after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function showFormEditBlogs(blogsId) {
+    // Hiển thị spinner trước khi gọi API
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetch(`${CONFIG.BASE_URL}/blogs/${blogsId}`)
+        .then(response => response.json())
+        .then(data => {
+            const form = document.querySelector("#BlogsForm");
+            Object.keys(data).forEach(key => {
+                let input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    if (input.tagName.toLowerCase() === "textarea" && key !== "description") {
+                        if ($(`#${input.id}`).summernote) {
+                            $(`#${input.id}`).summernote('code', data[key] || "");
+                        }
+                        else{
+                            input.value = data[key];
+                        }
+                    } else {
+                        if (key === "image" && data.image) {
+                            document.getElementById("blogsImagePreview").src =data.image;
+                        } else {
+                            input.value = data[key];
+                        }
+                    }
+                }
+            });
+            form.setAttribute("data-id", blogsId);
+            form.classList.remove("d-none");
+        })
+        .catch(error => console.error("Error fetching blogs:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function deleteBlogs(blogsId){
+    if (confirm("Are you sure you want to delete this blogs?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
+        fetch(`${CONFIG.BASE_URL}/blogs/${blogsId}`, {
+            method: "DELETE",
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
+        })
+        .then(response => {
+            if (response.status === 401) {
+                window.location.href = `${CONFIG.LOGIN_URL}`;
+            }
+            if (response.ok) {
+                toast_show_success.show();
+                fetchBlogs(); 
+            } else {
+                toast_show_error.show();
+                console.error("Error deleting blogs:", response.statusText);
+            }
+            
+        })
+        .catch(error => {
+            toast_show_error.show()
+            console.error("Error deleting blogs:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+    }
+}
+// ----- Function to display image preview when selecting a file --
 function displayImage(input, previewId) {
     const file = input.files[0];
     if (file) {
@@ -959,3 +1731,40 @@ document.querySelector("[name='background']").addEventListener("change", functio
 document.querySelector("[name='image']").addEventListener("change",function(){
     displayImage(this, "projectImagePreview");
 });
+document.querySelector("#imageTestimonial").addEventListener("change", function () {
+    displayImage(this, "testimonialImagePreview");
+});
+document.querySelector("#imageBlogs").addEventListener("change", function () {
+    displayImage(this, "blogsImagePreview");
+});
+// ----- Function to render pagination ----
+function renderPagination(containerId,totalItems, currentPage, pageSize, fetchFunction) {
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const pagination = document.getElementById(containerId);
+    pagination.innerHTML = "";
+
+    const createPageItem = (label, page, disabled = false, active = false) => {
+        return `
+        <li class="page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}">
+            <button class="page-link" data-page="${page}">${label}</button>
+        </li>`;
+    };
+
+    pagination.innerHTML += createPageItem("«", currentPage - 1, currentPage === 1);
+
+    for (let i = 1; i <= totalPages; i++) {
+        pagination.innerHTML += createPageItem(i, i, false, i === currentPage);
+    }
+
+    pagination.innerHTML += createPageItem("»", currentPage + 1, currentPage === totalPages);
+
+    // Gắn sự kiện
+    pagination.querySelectorAll(".page-link").forEach(button => {
+        button.addEventListener("click", () => {
+            const selectedPage = parseInt(button.dataset.page);
+            if (!isNaN(selectedPage)) {
+                fetchFunction(selectedPage);
+            }
+        });
+    });
+}

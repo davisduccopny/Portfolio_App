@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let data = await response.json();
         
         if (response.ok) {
-            localStorage.setItem("token", data.access_token);
+            localStorage.setItem("token_authorized_admin", data.access_token);
             toast_show_success.show();
             window.location.href = `${CONFIG.ADMIN_URL}`;
         } else {

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+import datetime
 
 class ProjectCreate(BaseModel):
     """Pydantic model for Project"""
@@ -60,7 +61,34 @@ class SkillCreate(BaseModel):
     """Pydantic model for Skills"""
     skill: str
     percentage: int
+    
+class ContactCreate(BaseModel):
+    """Pydantic model for ContactForm"""
+    name: str
+    email: str
+    subject: str
+    message: str
+    created_at: Optional[datetime.datetime] = None
+    
+class TestimonialsCreate(BaseModel):
+    """Pydantic model for Testmonial"""
+    name: str
+    position: str
+    company: str
+    description: str
+    image: Optional[str]
+    
+class BlogsCreate(BaseModel):
+    """Pydantic model for Blog"""
+    title: str
+    description: str
+    body_blog: str
+    image: Optional[str]
+    category: str
+    created_at: Optional[datetime.datetime] = None
+    
 class LoginCreate(BaseModel):
     """Pydantic model for login"""
     username: str
     password: str
+    

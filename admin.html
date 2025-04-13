@@ -13,7 +13,7 @@
     <link rel="icon" type="image/png" href="./assets/image/favicon-31.png" sizes="32x32">
     <link rel="stylesheet" href="./assets/css/admin.css">
 </head>
-<body data-bs-theme="dark">
+<body data-bs-theme="dark" style="display: none;">
     <div class="container mt-5">
         
         <!-- Dropdown Menu -->
@@ -39,6 +39,15 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" data-form="ExperienceFormContainer">Experience</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-form="TestimonialsContainer">Testimonials</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-form="ContactFormContainer">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-form="BlogsContainer">Blogs</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" data-form="LoginFormContainer">Login</a>
@@ -106,7 +115,20 @@
                 </div>
             </form>
             <div class="table-responsive p-2 g-3 border border-info rounded-2 mb-2">
-                <h3 class="border-bottom border-info border-3">List:</h3>
+                <div class="d-flex justify-content-between">
+                    <h3 class="col-md-9 border-bottom border-info border-3">List:</h3>
+                    <div class="col-md-3 row align-items-center">
+                        <label for="select-page-size-skills" class="col-sm-6 col-form-label">Select count item</label>
+                        <div class="col-sm-6">
+                            <select id="select-page-size-skills" name="select-page-size-skills" class="form-select form-select-sm" aria-label="Select page size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="0">Xem tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <table class="table table-hover table-bordered table-skill-fech">
                     <thead class="table-info">
                         <tr>
@@ -119,6 +141,7 @@
                     <tbody>
                     </tbody>
                 </table>
+                <ul class="pagination justify-content-center my-3" id="pagination-skills"></ul>
             </div>
         </div>
         <!-- Education Form -->
@@ -139,7 +162,20 @@
                 </div>
             </form>
             <div class="table-responsive p-2 g-3 border border-info rounded-2 mb-2">
-                <h3 class="border-bottom border-info border-3">List:</h3>
+                <div class="d-flex justify-content-between">
+                    <h3 class="col-md-9 border-bottom border-info border-3">List:</h3>
+                    <div class="col-md-3 row align-items-center">
+                        <label for="select-page-size-educations" class="col-sm-6 col-form-label">Select count item</label>
+                        <div class="col-sm-6">
+                            <select id="select-page-size-educations" name="select-page-size-educations" class="form-select form-select-sm" aria-label="Select page size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="0">Xem tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <table class="table table-hover table-bordered table-education-fech">
                     <thead class="table-info">
                         <tr>
@@ -154,6 +190,7 @@
                     <tbody>
                     </tbody>
                 </table>
+                <ul class="pagination justify-content-center my-3" id="pagination-educations"></ul>
             </div>
         </div>
         <!-- Project Form -->
@@ -185,7 +222,20 @@
                 </div>
             </form>
             <div class="table-responsive p-2 g-3 border border-info rounded-2 my-2">
-                <h3 class="border-bottom border-info border-3">List:</h3>
+                <div class="d-flex justify-content-between">
+                    <h3 class="col-md-9 border-bottom border-info border-3">List:</h3>
+                    <div class="col-md-3 row align-items-center">
+                        <label for="select-page-size-projects" class="col-sm-6 col-form-label">Select count item</label>
+                        <div class="col-sm-6">
+                            <select id="select-page-size-projects" name="select-page-size-projects" class="form-select form-select-sm" aria-label="Select page size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="0">Xem tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <table class="table table-hover table-bordered table-projects-fech">
                     <thead class="table-info">
                         <tr>
@@ -203,6 +253,7 @@
                     <tbody>
                     </tbody>
                 </table>
+                <ul class="pagination justify-content-center my-3" id="pagination-projects"></ul>
             </div>
         </div>
         <!-- Experience Form -->
@@ -229,7 +280,20 @@
                 </div>
             </form>
             <div class="table-responsive p-2 g-3 border border-info rounded-2 my-2">
-                <h3 class="border-bottom border-info border-3">List:</h3>
+                <div class="d-flex justify-content-between">
+                    <h3 class="col-md-9 border-bottom border-info border-3">List:</h3>
+                    <div class="col-md-3 row align-items-center">
+                        <label for="select-page-size-experiences" class="col-sm-6 col-form-label">Select count item</label>
+                        <div class="col-sm-6">
+                            <select id="select-page-size-experiences" name="select-page-size-experiences" class="form-select form-select-sm" aria-label="Select page size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="0">Xem tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <table class="table table-hover table-bordered table-experience-fech">
                     <thead class="table-info">
                         <tr>
@@ -245,8 +309,172 @@
                     <tbody>
                     </tbody>
                 </table>
+                <ul class="pagination justify-content-center my-3" id="pagination-experiences"></ul>
             </div>
         </div>
+        <!-- Testimonial Form -->
+        <div class="admin-form d-none" id="TestimonialsContainer">
+            <button class="btn btn-success add-form my-2" data-target="#testimonialForm">Add</button>
+            <form id="testimonialForm" data-id="" class="d-none show-form-add row p-2 g-3 bg-info bg-opacity-10 border border-info rounded-2 my-2" enctype="multipart/form-data">
+                <div class="d-flex flex-grow-1 justify-content-between">
+                    <h3>Testimonial</h3>
+                    <button class="btn btn-sm btn-danger cancel-form rounded-3"><i class="fa fa-close"></i></button>
+                </div>
+                <div class="col-md-6"><label for="name">Name:</label><input type="text" name="name" class="form-control" placeholder="Write name"></div>
+                <div class="col-md-6"><label for="position">Position:</label><input type="text" name="position" class="form-control" placeholder="Write Position"></div>
+                <div class="col-md-6"><label for="company">Company:</label><input type="text" name="company" class="form-control" placeholder="Write Company"></div>
+                <div class="col-md-6"><label for="image">Image:</label><input type="file" name="image" id="imageTestimonial" multiple class="form-control mb-2" placeholder="Choose image"><img id="testimonialImagePreview" src="" alt="testimonialImagePreview" width="100"></div>
+                <div class="mb-1"><label for="description">Description:</label><textarea name="description" id="description_testimonial" class="form-control"></textarea></div>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 px-5 btn-sm">Save</button>
+                    <button type="button" class="btn btn-secondary flex-grow-1 px-5 cancel-form btn-sm">Cancel</button>
+                </div>
+            </form>
+            <div class="table-responsive p-2 g-3 border border-info rounded-2 my-2">
+                <div class="d-flex justify-content-between">
+                    <h3 class="col-md-9 border-bottom border-info border-3">List:</h3>
+                    <div class="col-md-3 row align-items-center">
+                        <label for="select-page-size-testimonials" class="col-sm-6 col-form-label">Select count item</label>
+                        <div class="col-sm-6">
+                            <select id="select-page-size-testimonials" name="select-page-size-testimonials" class="form-select form-select-sm" aria-label="Select page size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="0">Xem tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-bordered table-testimonials-fech">
+                    <thead class="table-info">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Company</th>
+                            <th>Description</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <ul class="pagination justify-content-center my-3" id="pagination-testimonials"></ul>
+            </div>
+        </div>
+        <!-- Blogs Form -->
+        <div class="admin-form d-none" id="BlogsContainer">
+            <button class="btn btn-success add-form my-2" data-target="#BlogsForm">Add</button>
+            <form id="BlogsForm" data-id="" class="d-none show-form-add row p-2 g-3 bg-info bg-opacity-10 border border-info rounded-2 my-2" enctype="multipart/form-data">
+                <div class="d-flex flex-grow-1 justify-content-between">
+                    <h3>Blogs</h3>
+                    <button class="btn btn-sm btn-danger cancel-form rounded-3"><i class="fa fa-close"></i></button>
+                </div>
+                <div class="col-md-6"><label for="title">Title:</label><input type="text" maxlength="255" name="title" class="form-control" placeholder="Write title"></div>
+                <div class="col-md-3"><label for="image">Image:</label><input type="file" name="image" id="imageBlogs" class="form-control mb-2" placeholder="Choose image"><img id="blogsImagePreview" src="" alt="blogsImagePreview" width="100"></div>
+                <div class="col-md-3"><label for="category">Category</label><input type="text" name="category" maxlength="255" class="form-control" placeholder="Write category"></div>
+                <div class="mb-1"><label for="description">Description:</label><textarea name="description" maxlength="500" id="description_blogs" class="form-control"></textarea></div>
+                <div class="mb-1"><label for="body_blog">Body:</label><textarea name="body_blog" id="body_blog_text" class="form-control summernote"></textarea></div>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 px-5 btn-sm">Save</button>
+                    <button type="button" class="btn btn-secondary flex-grow-1 px-5 cancel-form btn-sm">Cancel</button>
+                </div>
+            </form>
+            <div class="table-responsive table-responsive-sm p-2 g-3 border border-info rounded-2 my-2">
+                <div class="d-flex justify-content-between">
+                    <h3 class="col-md-9 border-bottom border-info border-3">List:</h3>
+                    <div class="col-md-3 row align-items-center">
+                        <label for="select-page-size-blogs" class="col-sm-6 col-form-label">Select count item</label>
+                        <div class="col-sm-6">
+                            <select id="select-page-size-blogs" name="select-page-size-blogs" class="form-select form-select-sm" aria-label="Select page size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="0">Xem tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>               
+                <table class="table table-hover table-bordered table-blogs-fech">
+                    <thead class="table-info">
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Image</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Created_at</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <ul class="pagination justify-content-center my-3" id="pagination-blogs"></ul>
+            </div>
+
+        </div>
+        <!-- Contact Form -->
+         <div class="admin-form d-none" id="ContactFormContainer">
+            <!-- Modal for Contact Details -->
+            <div id="contactDetailsContainer" data-id="" class="d-none p-3 bg-info bg-opacity-10 border border-info rounded-2 show-form-add">
+                <h3>Contact Details</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> <span id="contactName"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Email:</strong> <span id="contactEmail"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Subject:</strong> <span id="contactSubject"></span></p>
+                    </div>
+                    <div class="col-md-12">
+                        <p><strong>Message:</strong></p>
+                        <p id="contactMessage"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Created Date:</strong> <span id="contactCreatedDate"></span></p>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary cancel-form" id="closeContactDetails">Close</button>
+                </div>
+            </div>
+            <div class="table-responsive p-2 g-3 border border-info rounded-2 my-2">
+                <div class="d-flex justify-content-between">
+                    <h3 class="col-md-9 border-bottom border-info border-3">List:</h3>
+                    <div class="col-md-3 row align-items-center">
+                        <label for="select-page-size-contacts" class="col-sm-6 col-form-label">Select count item</label>
+                        <div class="col-sm-6">
+                            <select id="select-page-size-contacts" name="select-page-size-contacts" class="form-select form-select-sm" aria-label="Select page size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="0">Xem tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-bordered table-contactForm-fech">
+                    <thead class="table-info">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Created date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <ul class="pagination justify-content-center my-3" id="pagination-contacts"></ul>
+            </div>
+         </div>
         <!-- Login Edit form -->
         <form id="LoginFormContainer" class="admin-form d-none row g-3 p-2 bg-info bg-opacity-10 border border-info rounded-2 ">
             <h3>Profile</h3>
@@ -272,12 +500,14 @@
             </div>
         </div>
     </div>
-    <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                Đã xảy ra lỗi!
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Đã xảy ra lỗi!
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

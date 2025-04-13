@@ -15,6 +15,8 @@
   --default-font: "Roboto",  system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --heading-font: "Raleway",  sans-serif;
   --nav-font: "Poppins",  sans-serif;
+  --border-show-form: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  --box-shadow-form: 0px 0px 20px color-mix(in srgb, var(--default-color), transparent 90%);
 }
 
 /* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
@@ -25,6 +27,12 @@
   --accent-color: #149ddd; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
   --surface-color: #ffffff; /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
   --contrast-color: #ffffff; /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
+  --text-muted-color: #6c757d;
+  --form-search-color: #fff;
+  --form-search-icon: #000;
+  --form-search-text: #000;
+  --card-category-color: #a3b3c8;
+  
 }
 
 /* Nav Menu Colors - The following color variables are used specifically for the navigation menu. They are separate from the global colors to allow for more customization options */
@@ -35,6 +43,26 @@
   --nav-dropdown-background-color: #040b14; /* Used as the background color for dropdown items that appear when hovering over primary navigation items */
   --nav-dropdown-color: #a8a9b4; /* Used for navigation links of the dropdown items in the navigation menu. */
   --nav-dropdown-hover-color: #ffffff; /* Similar to --nav-hover-color, this color is applied to dropdown navigation links when they are hovered over. */
+}
+:root.dark-theme {
+  --background-color: #040b14;
+  --default-color: #ffffff;
+  --heading-color: #ffffff;
+  --accent-color: #149ddd;
+  --surface-color: #151f2b;
+  --contrast-color: #ffffff;
+  --text-muted-color: #adb5bd;
+  --form-search-color: #151f2b;
+  --form-search-icon: #aaa;
+  --form-search-text: #eee;
+  --card-category-color: #2d4562;
+
+  --nav-color: #a8a9b4;
+  --nav-hover-color: #ffffff;
+  --nav-mobile-background-color: #040b14;
+  --nav-dropdown-background-color: #040b14;
+  --nav-dropdown-color: #a8a9b4;
+  --nav-dropdown-hover-color: #ffffff;
 }
 
 /* Color Presets - These classes override global colors when applied to any section or element, providing reuse of the sam color scheme. */
@@ -87,57 +115,6 @@ h6 {
   font-family: var(--heading-font);
 }
 
-/* PHP Email Form Messages
-------------------------------*/
-.php-email-form .error-message {
-  display: none;
-  background: #df1529;
-  color: #ffffff;
-  text-align: left;
-  padding: 15px;
-  margin-bottom: 24px;
-  font-weight: 600;
-}
-
-.php-email-form .sent-message {
-  display: none;
-  color: #ffffff;
-  background: #059652;
-  text-align: center;
-  padding: 15px;
-  margin-bottom: 24px;
-  font-weight: 600;
-}
-
-.php-email-form .loading {
-  display: none;
-  background: var(--surface-color);
-  text-align: center;
-  padding: 15px;
-  margin-bottom: 24px;
-}
-
-.php-email-form .loading:before {
-  content: "";
-  display: inline-block;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  margin: 0 10px -6px 0;
-  border: 3px solid var(--accent-color);
-  border-top-color: var(--surface-color);
-  animation: php-email-form-loading 1s linear infinite;
-}
-
-@keyframes php-email-form-loading {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
 
 /*--------------------------------------------------------------
 # Global Header
@@ -1091,22 +1068,23 @@ section,
   color: var(--contrast-color);
 }
 
-.contact .php-email-form {
-  background-color: var(--surface-color);
+.contact .form-contact-bg {
+  background-color: var(--form-search-color);
   height: 100%;
   padding: 30px;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow-form);
+  border: var(--border-show-form);
 }
 
 @media (max-width: 575px) {
-  .contact .php-email-form {
+  .contact .form-contact-bg {
     padding: 20px;
   }
 }
 
-.contact .php-email-form input[type=text],
-.contact .php-email-form input[type=email],
-.contact .php-email-form textarea {
+.contact .form-contact-bg input[type=text],
+.contact .form-contact-bg input[type=email],
+.contact .form-contact-bg textarea {
   font-size: 14px;
   padding: 10px 15px;
   box-shadow: none;
@@ -1116,19 +1094,19 @@ section,
   border-color: color-mix(in srgb, var(--default-color), transparent 80%);
 }
 
-.contact .php-email-form input[type=text]:focus,
-.contact .php-email-form input[type=email]:focus,
-.contact .php-email-form textarea:focus {
+.contact .form-contact-bg input[type=text]:focus,
+.contact .form-contact-bg input[type=email]:focus,
+.contact .form-contact-bg textarea:focus {
   border-color: var(--accent-color);
 }
 
-.contact .php-email-form input[type=text]::placeholder,
-.contact .php-email-form input[type=email]::placeholder,
-.contact .php-email-form textarea::placeholder {
+.contact .form-contact-bg input[type=text]::placeholder,
+.contact .form-contact-bg input[type=email]::placeholder,
+.contact .form-contact-bg textarea::placeholder {
   color: color-mix(in srgb, var(--default-color), transparent 70%);
 }
 
-.contact .php-email-form button[type=submit] {
+.contact .form-contact-bg button[type=submit] {
   color: var(--contrast-color);
   background: var(--accent-color);
   border: 0;
@@ -1137,7 +1115,7 @@ section,
   border-radius: 50px;
 }
 
-.contact .php-email-form button[type=submit]:hover {
+.contact .form-contact-bg button[type=submit]:hover {
   background: color-mix(in srgb, var(--accent-color), transparent 25%);
 }
 
@@ -1267,9 +1245,87 @@ section,
   color: var(--accent-color);
 }
 
-/*--------------------------------------------------------------
-# Starter Section Section
---------------------------------------------------------------*/
-.starter-section {
-  /* Add your styles here */
+/* ------------------------------------------------------------ */
+/* Blog Section */
+section#blog {
+  background-color: var(--background-color);
+  color: var(--default-color);
+}
+
+#blog .section-title h2,
+#blog .section-title p {
+  color: var(--heading-color);
+}
+
+.blog-item {
+  background-color: var(--surface-color);
+  color: var(--default-color);
+}
+
+.blog-title a {
+  color: var(--heading-color);
+  text-decoration: none;
+}
+
+.blog-title a:hover {
+  color: var(--accent-color);
+}
+
+.blog-description {
+  color: var(--default-color); 
+}
+
+:root.dark-theme .blog-item {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+.text-muted-custome {
+  color: var(--text-muted-color);
+}
+
+/* SEARCH BOX*/
+.search-box {
+  background-color: var(--form-search-color);
+  padding: 1rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  color: var(--form-search-text);
+  font-family: sans-serif;
+}
+
+.search-label {
+  font-size: 0.9rem;
+  color: var(--form-search-icon);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: var(--form-search-color);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+}
+
+.search-input-wrapper input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--form-search-text);
+  flex-grow: 1;
+  font-size: 1rem;
+}
+
+.search-input-wrapper input::placeholder {
+  color: var(--form-search-icon);
+}
+
+.search-icon {
+  background: none;
+  border: none;
+  color: var(--form-search-icon);
+  font-size: 1.1rem;
+  cursor: pointer;
 }
