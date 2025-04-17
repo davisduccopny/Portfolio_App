@@ -186,6 +186,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+    document.querySelectorAll(".cancel-form-modal").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            let parentForm = this.closest(".show-form-modal");
+            if (parentForm) {
+                parentForm.reset();
+                parentForm.removeAttribute("data-id"); 
+            }
+        });
+    });
 
 });
 // ---- SET FORM ACTION ----
@@ -326,8 +336,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         formData.append(id, $(`#${id}`).summernote('code'));
                     }
                 });
-
-                // Gửi request
+                const selectedTags = Array.from(document.querySelector("[name='tag_ids']").selectedOptions).map(option => option.value);
+                formData.append("tag_ids", JSON.stringify(selectedTags)); // ➜ "['2', '3']"
                 const response = await fetch(url, {
                     method: method,
                     body: formData,
@@ -1560,7 +1570,41 @@ function deleteTestimonial(testimonialId){
         });
     }
 }
+
 // BLOGS
+document.addEventListener("DOMContentLoaded", function () {
+    function populateCategoryAndTagSelects() {
+        const categorySelect = document.getElementById("categorySelect");
+        const tagSelect = document.getElementById("tagSelect");
+
+        // Fetch categories
+        fetchWithRetry(`${CONFIG.BASE_URL}/categories`)
+            .then(categories => {
+                categorySelect.innerHTML = ""; 
+                categories.forEach(category => {
+                    const option = document.createElement("option");
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching categories:", error));
+
+        // Fetch tags
+        fetchWithRetry(`${CONFIG.BASE_URL}/tags`)
+            .then(tags => {
+                tagSelect.innerHTML = ""; 
+                tags.forEach(tag => {
+                    const option = document.createElement("option");
+                    option.value = tag.id;
+                    option.textContent = tag.name;
+                    tagSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching tags:", error));
+    }
+    populateCategoryAndTagSelects();
+});
 function fetchBlogs(page = PAGINATION.currentPage_blogs) {
     const limit = PAGESIZE.blogs;
     const offset = limit > 0 ? (page - 1) * limit : 0;
@@ -1579,7 +1623,8 @@ function fetchBlogs(page = PAGINATION.currentPage_blogs) {
                     <td>${blog.id}</td>
                     <td>${blog.title.substring(0, 50)}</td>
                     <td><img src="${blog.image}" width="100" height="100" class="img-fluid"></td>
-                    <td>${blog.category}</td>
+                    <td>${blog.category.name}</td>
+                    <td>${blog.tags.map(tag => tag.name).join(", ")}</td>
                     <td>${blog.description.substring(0, 50)}</td>
                     <td>${blog.created_at}</td>
                     <td>
@@ -1656,15 +1701,29 @@ function showFormEditBlogs(blogsId) {
                     if (input.tagName.toLowerCase() === "textarea" && key !== "description") {
                         if ($(`#${input.id}`).summernote) {
                             $(`#${input.id}`).summernote('code', data[key] || "");
-                        }
-                        else{
+                        } else {
                             input.value = data[key];
                         }
                     } else {
                         if (key === "image" && data.image) {
                             document.getElementById("blogsImagePreview").src =data.image;
-                        } else {
+                        } 
+                        else {
                             input.value = data[key];
+                        }
+                    }
+                }
+                else{
+                    if (key === "category" || key === "tags") {
+                        if (key === "category") {
+                            const categoryId = form.querySelector(`[name="category_id"]`);
+                            categoryId.value = data.category.id; 
+                        } else if (key === "tags") {
+                            const input_tags = form.querySelector(`[name="tag_ids"]`);
+                            const selectedTags = data.tags.map(tag => tag.id);
+                            Array.from(input_tags.options).forEach(option => {
+                                option.selected = selectedTags.includes(parseInt(option.value));
+                            });
                         }
                     }
                 }
@@ -1711,6 +1770,331 @@ function deleteBlogs(blogsId){
         });
     }
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const formCategory = document.querySelector("#CategoryForm");
+    if (formCategory) {
+        formCategory.addEventListener("submit", Add_Edit_Category);
+    }
+    const formTag = document.querySelector("#TagForm");
+    if (formTag){
+        formTag.addEventListener("submit", Add_Edit_Tag);
+    }
+});
+// CATEGORY
+document.querySelectorAll(".add-form-orther").forEach(button => {
+    button.addEventListener("click", function () {
+        const targetModal = document.querySelector(this.getAttribute("data-target"));
+        if (targetModal) {
+            const modalInstance = new bootstrap.Modal(targetModal);
+            modalInstance.show();
+            window.addEventListener("shown.bs.modal", function () {
+                const form = targetModal.querySelector("form");
+                if (form) {
+                    form.reset(); 
+                    form.removeAttribute("data-id");
+                }
+                
+            });
+            if (targetModal == document.querySelector("#CategoryModal")) {
+                fetchCategory(); 
+            }
+            if (targetModal == document.querySelector("#TagModal")) {
+                fetchTag(); 
+            }
+        }
+    });
+});
+function Add_Edit_Category(event) {
+    event.preventDefault();
+    target_form = document.querySelector("#CategoryForm");
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    const formData = new FormData(target_form);
+    const categoryId = target_form.getAttribute("data-id");
+    let url = `${CONFIG.BASE_URL}/categories`;
+    let method = "POST"; 
+
+    if (categoryId) {
+        url = `${CONFIG.BASE_URL}/categories/${categoryId}`;
+        method = "PUT"; 
+    }
+    fetch(url, {
+        method: method,
+        body: formData,
+        headers: { 
+            'Authorization': `Bearer ${SETUP_SECURE.token}`
+         }
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.href = `${CONFIG.LOGIN_URL}`;
+        }
+        return response.json()
+    })
+    .then(data => {
+        toast_show_success.show();
+        console.log("Success:", data);
+        fetchCategory();
+        target_form.reset(); 
+        target_form.removeAttribute("data-id");
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        toast_show_error.show();
+    })
+    .finally(() => {
+        if (spinner) {
+            spinner.classList.add("d-none");
+        }
+    });
+}
+function fetchCategory(){
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/categories`)
+        .then(data => {
+            const categoryContainer = document.querySelector(".table-category-fech tbody");
+            let content = "";
+            data.forEach(category => {
+                content += `
+                <tr>
+                    <td>${category.id}</td>
+                    <td>${category.name}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2 mb-2 btn-edit-category" data-target-id ="${category.id}"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger btn-sm mb-2 btn-delete-category" data-target-id ="${category.id}"><i class="fa fa-trash"></i> Delete</button>
+                    </td>
+                </tr>`;
+            });
+            categoryContainer.innerHTML = content;
+
+            // Gán sự kiện Edit/Delete
+            document.querySelectorAll(".btn-edit-category").forEach(button => {
+                button.addEventListener("click", function () {
+                    const categoryId = this.getAttribute("data-target-id");
+                    showFormEditCategory(categoryId);
+                });
+            });
+            document.querySelectorAll(".btn-delete-category").forEach(button => {
+                button.addEventListener("click", function () {
+                    const categoryId = this.getAttribute("data-target-id");
+                    deleteCategory(categoryId);
+                });
+            });
+        })
+        .catch(error => console.error("Error loading category after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function showFormEditCategory(categoryId) {
+    // Hiển thị spinner trước khi gọi API
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetch(`${CONFIG.BASE_URL}/categories/${categoryId}`)
+        .then(response => response.json())
+        .then(data => {
+            const form = document.querySelector("#CategoryForm");
+            Object.keys(data).forEach(key => {
+                let input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    input.value = data[key];
+                }
+            });
+            form.setAttribute("data-id", categoryId);
+            form.classList.remove("d-none");
+        })
+        .catch(error => console.error("Error fetching category:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function deleteCategory(categoryId){
+    if (confirm("Are you sure you want to delete this category?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
+        fetch(`${CONFIG.BASE_URL}/categories/${categoryId}`, {
+            method: "DELETE",
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
+        })
+        .then(response => {
+            if (response.status === 401) {
+                window.location.href = `${CONFIG.LOGIN_URL}`;
+            }
+            if (response.ok) {
+                toast_show_success.show();
+                fetchCategory(); 
+            } else {
+                toast_show_error.show();
+                console.error("Error deleting category:", response.statusText);
+            }
+            
+        })
+        .catch(error => {
+            toast_show_error.show()
+            console.error("Error deleting category:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+    }
+}
+// TAGS
+function Add_Edit_Tag(event) {
+    event.preventDefault();
+    target_form = document.querySelector("#TagForm");
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    const formData = new FormData(target_form);
+    const tagId = target_form.getAttribute("data-id");
+    let url = `${CONFIG.BASE_URL}/tags`;
+    let method = "POST"; 
+
+    if (tagId) {
+        url = `${CONFIG.BASE_URL}/tags/${tagId}`;
+        method = "PUT"; 
+    }
+    fetch(url, {
+        method: method,
+        body: formData,
+        headers: { 
+            'Authorization': `Bearer ${SETUP_SECURE.token}`
+         }
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.href = `${CONFIG.LOGIN_URL}`;
+        }
+        return response.json()
+    })
+    .then(data => {
+        toast_show_success.show();
+        console.log("Success:", data);
+        fetchTag();
+        target_form.reset(); 
+        target_form.removeAttribute("data-id");
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        toast_show_error.show();
+    })
+    .finally(() => {
+        if (spinner) {
+            spinner.classList.add("d-none");
+        }
+    });
+}
+function fetchTag(){
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetchWithRetry(`${CONFIG.BASE_URL}/tags`)
+        .then(data => {
+            const tagContainer = document.querySelector(".table-tag-fech tbody");
+            let content = "";
+            data.forEach(tag => {
+                content += `
+                <tr>
+                    <td>${tag.id}</td>
+                    <td>${tag.name}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2 mb-2 btn-edit-tag" data-target-id ="${tag.id}"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger btn-sm mb-2 btn-delete-tag" data-target-id ="${tag.id}"><i class="fa fa-trash"></i> Delete</button>
+                    </td>
+                </tr>`;
+            });
+            tagContainer.innerHTML = content;
+
+            // Gán sự kiện Edit/Delete
+            document.querySelectorAll(".btn-edit-tag").forEach(button => {
+                button.addEventListener("click", function () {
+                    const tagId = this.getAttribute("data-target-id");
+                    showFormEditTag(tagId);
+                });
+            });
+            document.querySelectorAll(".btn-delete-tag").forEach(button => {
+                button.addEventListener("click", function () {
+                    const tagId = this.getAttribute("data-target-id");
+                    deleteTag(tagId);
+                });
+            });
+        })
+        .catch(error => console.error("Error loading category after retry:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+
+}
+function showFormEditTag(tagId) {
+    // Hiển thị spinner trước khi gọi API
+    if (spinner) {
+        spinner.classList.remove("d-none");
+    }
+    fetch(`${CONFIG.BASE_URL}/tags/${tagId}`)
+        .then(response => response.json())
+        .then(data => {
+            const form = document.querySelector("#TagForm");
+            Object.keys(data).forEach(key => {
+                let input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    input.value = data[key];
+                }
+            });
+            form.setAttribute("data-id", tagId);
+            form.classList.remove("d-none");
+        })
+        .catch(error => console.error("Error fetching tag:", error))
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+}
+function deleteTag(tagId){
+    if (confirm("Are you sure you want to delete this tag?")) {
+        if (spinner) {
+            spinner.classList.remove("d-none");
+        }
+        fetch(`${CONFIG.BASE_URL}/tags/${tagId}`, {
+            method: "DELETE",
+            headers: {'Authorization': `Bearer ${SETUP_SECURE.token}`}
+        })
+        .then(response => {
+            if (response.status === 401) {
+                window.location.href = `${CONFIG.LOGIN_URL}`;
+            }
+            if (response.ok) {
+                toast_show_success.show();
+                fetchTag(); 
+            } else {
+                toast_show_error.show();
+                console.error("Error deleting tag:", response.statusText);
+            }
+            
+        })
+        .catch(error => {
+            toast_show_error.show()
+            console.error("Error deleting tag:", error);})
+        .finally(() => {
+            if (spinner) {
+                spinner.classList.add("d-none");
+            }
+        });
+    }
+}
+
 // ----- Function to display image preview when selecting a file --
 function displayImage(input, previewId) {
     const file = input.files[0];

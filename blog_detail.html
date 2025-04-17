@@ -153,6 +153,7 @@
                   environments,
                   dependency management, and code formatting, there's a lot to juggle.
                 </p>
+                <img src="assets/img/portfolio/app-2.jpg" class="img-fluid" alt="">
 
                 <h3>The Vision</h3>
                 <p>
@@ -316,7 +317,33 @@
 
   <!-- Preloader -->
   <div id="preloader"></div>
-
+  <!-- <script src="assets/js/config.js"></script>
+  <script>
+      function fetchBlogDetail() {
+          const blogId = new URLSearchParams(window.location.search).get("blog_id");
+          fetch(`${CONFIG.BASE_URL}/blogs/${blogId}`)
+              .then(response => response.json())
+              .then(data => {
+                  document.querySelector('.portfolio-details-slider .swiper-wrapper').innerHTML = `
+          <div class="swiper-slide">
+            <img src="${data.image}" alt="${data.title}">
+          </div>
+        `;
+                  document.querySelector('.portfolio-info ul').innerHTML = `
+          <li><strong>Category</strong>: ${data.category}</li>
+          <li><strong>Client</strong>: ${data.client}</li>
+          <li><strong>Project date</strong>: ${data.project_date}</li>
+          <li><strong>Project URL</strong>: <a href="${data.github_link}">${data.github_link.split('/').pop()}</a></li>
+        `;
+                  document.querySelector('.portfolio-description h2').innerText = data.title;
+                  document.querySelector('.portfolio-description p').innerText = data.description;
+              })
+              .catch(error => console.error('Error fetching project details:', error));
+      }
+      document.addEventListener('DOMContentLoaded', function () {
+          fetchBlogDetail();
+      });
+  </script> -->
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>

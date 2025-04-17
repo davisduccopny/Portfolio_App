@@ -6,9 +6,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Blog Page</title>
     <meta content="" name="description">
-    <meta
-        content="portfolio, web development, data analysis, creativity, projects, skills, design, data-driven solutions"
-        name="keywords">
+    <meta content="portfolio, web development, data analysis, creativity, projects, skills, design, data-driven solutions" name="keywords">
 
     <!-- Favicons -->
     <link href="assets/image/favicon-16.png" rel="icon">
@@ -55,11 +53,11 @@
 
         <nav id="navmenu" class="navmenu">
             <ul>
-                <li><a href="#hero" class="active"><i class="bi bi-house navicon"></i>Home</a></li>
-                <li><a href="#about"><i class="bi bi-person navicon"></i> About</a></li>
-                <li><a href="#resume"><i class="bi bi-file-earmark-text navicon"></i> Resume</a></li>
-                <li><a href="#portfolio"><i class="bi bi-images navicon"></i> Portfolio</a></li>
-                <li><a href="#blog"><i class="bi bi-hdd-stack navicon"></i> Blog</a></li>
+                <li><a href="index.html#hero" class="active"><i class="bi bi-house navicon"></i>Home</a></li>
+                <li><a href="index.html#about"><i class="bi bi-person navicon"></i> About</a></li>
+                <li><a href="index.html#resume"><i class="bi bi-file-earmark-text navicon"></i> Resume</a></li>
+                <li><a href="index.html#portfolio"><i class="bi bi-images navicon"></i> Portfolio</a></li>
+                <li><a href="index.html#blog"><i class="bi bi-hdd-stack navicon"></i> Blog</a></li>
                 <!-- <li class="dropdown"><a href="#"><i class="bi bi-menu-button navicon"></i> <span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
             <li><a href="#">Dropdown 1</a></li>
@@ -92,13 +90,6 @@
     <main class="main">
         <section id="blog" class="blog section" style="max-width: 90%;margin:0 auto;">
             <div class="container" data-aos="fade-up">
-                <!-- Section Title -->
-                <div class="text-center mb-5">
-                    <h2>Blog</h2>
-                    <p>Explore our latest articles, insights, and updates. Stay informed and inspired with our
-                        curated
-                        content.</p>
-                </div>
                 <!-- New Row with Sidebar + Main content -->
                 <div class="container-fluid d-flex flex-column flex-lg-row gap-3">
                     <!-- Sidebar: Search & Categories -->
@@ -126,10 +117,28 @@
                                     <li><a href="#" class="btn btn-outline-secondary btn-sm">How Tos</a></li>
                                 </ul>
                             </div>
+                            <!-- Tags -->
+                            <div class="Tags">
+                                <h5>Tags</h5>
+                                <ul class="list-unstyled d-flex flex-wrap gap-2">
+                                    <li><a href="#" class="btn btn-outline-secondary btn-sm">Python</a></li>
+                                    <li><a href="#" class="btn btn-outline-secondary btn-sm">SQL</a></li>
+                                    <li><a href="#" class="btn btn-outline-secondary btn-sm">Power BI</a></li>
+                                    <li><a href="#" class="btn btn-outline-secondary btn-sm">Statistical</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <!-- Main Content: Blog List -->
                     <div class="col-md-9 order-2 order-lg-1">
+                        <!-- Section Title -->
+                        <div class="blog-item mb-5 title-blog-head rounded-3 shadow-sm p-3">
+                            <h2>Blog</h2>
+                            <p class="text-muted-custome">Explore our latest articles, insights, and updates. Stay
+                                informed and inspired with our
+                                curated
+                                content.</p>
+                        </div>
                         <div class="row gy-3">
                             <!-- Blog Item -->
                             <div class="col-12 position-relative" data-target-id="">
@@ -219,7 +228,8 @@
 
                         <!-- Pagination -->
                         <div class="pagination d-flex justify-content-center mt-4">
-                            <ul class="pagination-list list-unstyled d-flex align-items-center gap-2">
+                            <ul class="pagination-list list-unstyled d-flex align-items-center gap-2"
+                                id="pagination-blogs">
                                 <li><a href="#" class="btn btn-outline-secondary px-3 py-1 active">1</a></li>
                                 <li><a href="#" class="btn btn-outline-secondary px-3 py-1">2</a></li>
                                 <li><span class="btn btn-outline-secondary px-3 py-1 disabled">...</span></li>
@@ -230,6 +240,14 @@
                 </div>
             </div>
         </section>
+        <!-- Spinner -->
+        <div id="loadingSpinner"
+            class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-50"
+            style="z-index: 1050;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
     </main>
 
     <footer id="footer" class="footer position-relative ">
@@ -252,7 +270,9 @@
 
     <!-- Preloader -->
     <div id="preloader"></div>
-
+    <!-- Load data js -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/blogs.js"></script>
     <!-- Vendor JS Files -->
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendor/php-email-form/validate.js"></script>
@@ -267,10 +287,6 @@
 
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
-
-    <!-- Data js -->
-    <script src="assets/js/config.js"></script>
-    <script src="assets/js/blogs.js"></script>
 
 </body>
 

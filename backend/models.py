@@ -1,6 +1,6 @@
-from sqlmodel import SQLModel, Field,Column
+from sqlmodel import SQLModel, Field,Column,Relationship,ForeignKey
 from sqlalchemy import func
-from typing import Optional
+from typing import Optional,List
 import datetime
 from sqlalchemy.dialects.mysql import TEXT,VARCHAR
 
@@ -100,7 +100,24 @@ class Login(SQLModel,table=True):
     id: int = Field(default=None, primary_key=True)
     username: str
     password: str
+
+class BlogTagLink(SQLModel, table=True):
+    """Link table for Blogs and Tags"""
+    blog_id: Optional[int] = Field(default=None, foreign_key="blogs.id", primary_key=True)
+    tag_id: Optional[int] = Field(default=None, foreign_key="tag.id", primary_key=True)
+
+class Tag(SQLModel, table=True):
+    """SQLModel class for the Tag table"""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(sa_column=Column(VARCHAR(255)))
+    blogs: List["Blogs"] = Relationship(back_populates="tags", link_model=BlogTagLink)
     
+class Category(SQLModel, table=True):
+    """SQLModel class for the Category table"""
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(sa_column=Column(VARCHAR(255)))
+    blogs: List["Blogs"] = Relationship(back_populates="category")
+
 class Blogs(SQLModel, table=True):
     """SQLModel class for the Blogs table"""
     id: int = Field(default=None, primary_key=True)
@@ -108,9 +125,14 @@ class Blogs(SQLModel, table=True):
     description: str = Field(sa_column=Column(VARCHAR(500)))
     body_blog: str = Field(sa_column=Column(TEXT))
     image: Optional[str] = Field(sa_column=Column(VARCHAR(500)))
-    category: str
     created_at: Optional[datetime.datetime] = Field(
         default=None,
         sa_column_kwargs={"server_default": func.current_timestamp()}
     )
+    category_id: Optional[int] = Field(default=None, foreign_key="category.id")
+    category: Optional[Category] = Relationship(back_populates="blogs")
+    tags: List[Tag] = Relationship(back_populates="blogs", link_model=BlogTagLink)
+    
+
+
     

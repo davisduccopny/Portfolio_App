@@ -1,4 +1,5 @@
 from sqlmodel import Session, select,func
+from fastapi import HTTPException
 from models import Project, Profile, Experience, Education, Skills, ContactForm, Testimonials,Blogs
 from config import BASE_URL_IMAGE
 
@@ -182,10 +183,8 @@ def delete_testimonial(session: Session, testimonial_id: int):
 # Blogs CRUD
 def get_blogs(session: Session, limit: int = 5, offset: int = 0):
     total = session.exec(select(func.count()).select_from(Blogs)).one()
-    base_query = select(
-        Blogs.id, Blogs.title, Blogs.description, Blogs.image,
-        Blogs.created_at, Blogs.category
-    ).order_by(Blogs.created_at.desc())
+    base_query = select(Blogs).order_by(Blogs.created_at.desc())
+
     if limit > 0:
         base_query = base_query.offset(offset).limit(limit)
 
@@ -194,20 +193,134 @@ def get_blogs(session: Session, limit: int = 5, offset: int = 0):
     blog_summaries = []
     for blog in blogs:
         if blog is None:
-            continue  # tránh lỗi nếu blog là None
-        blog_dict = blog._asdict() if hasattr(blog, "_asdict") else dict(blog)
-        if blog_dict.get("image"):
-            blog_dict["image"] = f"{BASE_URL_IMAGE}{blog_dict['image']}"
+            continue
+        
+        blog_dict = {
+            "id": blog.id,
+            "title": blog.title,
+            "description": blog.description,
+            "created_at": blog.created_at,
+            "image": f"{BASE_URL_IMAGE}{blog.image}" if blog.image else None,
+            "category": {
+                "id": blog.category.id,
+                "name": blog.category.name
+            } if blog.category else None,
+            "tags": [{"id": tag.id, "name": tag.name} for tag in blog.tags]
+        }
+
         blog_summaries.append(blog_dict)
 
     return {
         "total": total,
-        "blogs": blog_summaries  # đảm bảo luôn là danh sách
+        "blogs": blog_summaries
     }
 
+def query_blogs_by_search_string(session: Session, search_string: str, limit: int = 5, offset: int = 0):
+    total = session.exec(select(func.count()).select_from(Blogs).where(
+        (Blogs.title.ilike(f"%{search_string}%")) | (Blogs.description.ilike(f"%{search_string}%"))
+    )).one()
+    base_query = select(Blogs).where(
+        (Blogs.title.ilike(f"%{search_string}%")) | (Blogs.description.ilike(f"%{search_string}%"))
+    ).order_by(Blogs.created_at.desc())
 
-def get_blog_by_id(session: Session, blog_id: int):
-    return session.get(Blogs, blog_id)
+    if limit > 0:
+        base_query = base_query.offset(offset).limit(limit)
+
+    blogs = session.exec(base_query).all()
+
+    blog_summaries = []
+    for blog in blogs:
+        if blog is None:
+            continue
+        
+        blog_dict = {
+            "id": blog.id,
+            "title": blog.title,
+            "description": blog.description,
+            "created_at": blog.created_at,
+            "image": f"{BASE_URL_IMAGE}{blog.image}" if blog.image else None,
+            "category": {
+                "id": blog.category.id,
+                "name": blog.category.name
+            } if blog.category else None,
+            "tags": [{"id": tag.id, "name": tag.name} for tag in blog.tags]
+        }
+
+        blog_summaries.append(blog_dict)
+
+    return {
+        "total": total,
+        "blogs": blog_summaries
+    }
+
+def read_blogs_by_category_id(session: Session, category_id: int, limit: int = 5, offset: int = 0):
+    total = session.exec(select(func.count()).select_from(Blogs).where(Blogs.category_id == category_id)).one()
+    base_query = select(Blogs).where(Blogs.category_id == category_id).order_by(Blogs.created_at.desc())
+
+    if limit > 0:
+        base_query = base_query.offset(offset).limit(limit)
+
+    blogs = session.exec(base_query).all()
+
+    blog_summaries = []
+    for blog in blogs:
+        if blog is None:
+            continue
+        
+        blog_dict = {
+            "id": blog.id,
+            "title": blog.title,
+            "description": blog.description,
+            "created_at": blog.created_at,
+            "image": f"{BASE_URL_IMAGE}{blog.image}" if blog.image else None,
+            "category": {
+                "id": blog.category.id,
+                "name": blog.category.name
+            } if blog.category else None,
+            "tags": [{"id": tag.id, "name": tag.name} for tag in blog.tags]
+        }
+
+        blog_summaries.append(blog_dict)
+
+    return {
+        "total": total,
+        "blogs": blog_summaries
+    }
+
+def read_blogs_by_tag_ids(session:Session, tag_id:int, limit:int=5, offset:int=0):
+    total = session.exec(select(func.count()).select_from(Blogs).where(Blogs.tags.any(id=tag_id))).one()
+    base_query = select(Blogs).where(Blogs.tags.any(id=tag_id)).order_by(Blogs.created_at.desc())
+
+    if limit > 0:
+        base_query = base_query.offset(offset).limit(limit)
+
+    blogs = session.exec(base_query).all()
+
+    blog_summaries = []
+    for blog in blogs:
+        if blog is None:
+            continue
+
+        blog_dict = {
+            "id": blog.id,
+            "title": blog.title,
+            "description": blog.description,
+            "created_at": blog.created_at,
+            "image": f"{BASE_URL_IMAGE}{blog.image}" if blog.image else None,
+            "category": {
+                "id": blog.category.id,
+                "name": blog.category.name
+            } if blog.category else None,
+            "tags": [{"id": tag.id, "name": tag.name} for tag in blog.tags]
+        }
+
+        blog_summaries.append(blog_dict)
+
+    return {
+        "total": total,
+        "blogs": blog_summaries
+    }
+    
 
 def create_blog(session: Session, blog: Blogs):
     session.add(blog)

@@ -3,9 +3,10 @@ from sqlmodel import Session, select
 from database import get_session
 from crud import get_all_projects, get_project_by_id, delete_project,get_profile, get_experiences, add_experience, delete_experience, get_education, add_education, delete_education,get_skills,create_skill,delete_skill
 from crud import get_education_by_id,get_experience_by_id,get_skill_by_id,read_contact_form,get_contact_form_by_id,delete_contact_form,create_contact_form
-from crud import get_testimonials,get_testimonial_by_id,create_testimonial,delete_testimonial,get_blogs,get_blog_by_id,create_blog,delete_blog
-from models import Project,Profile, Experience, Education, Skills,Login,ContactForm,Testimonials,Blogs
-from schemas import ProjectCreate,ProfileUpdate, ExperienceCreate, EducationCreate, SkillCreate,LoginCreate,ContactCreate,TestimonialsCreate,BlogsCreate
+from crud import get_testimonials,get_testimonial_by_id,create_testimonial,delete_testimonial,get_blogs,create_blog,delete_blog
+from crud import read_blogs_by_category_id,read_blogs_by_tag_ids,query_blogs_by_search_string
+from models import Project,Profile, Experience, Education, Skills,Login,ContactForm,Testimonials,Blogs,Tag, BlogTagLink,Category
+from schemas import ProjectCreate,ProfileUpdate, ExperienceCreate, EducationCreate, SkillCreate,LoginCreate,ContactCreate,TestimonialsCreate,BlogCreate,CategoryUsed,TagUsed
 from typing import List, Optional,Union
 from config import BASE_URL_IMAGE, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 import cloudinary.uploader
@@ -17,6 +18,7 @@ import io
 import base64
 import os
 import uuid
+import json
 
 from passlib.context import CryptContext
 from datetime import datetime, timedelta,timezone
@@ -579,25 +581,191 @@ def remove_testimonial(testimonial_id: int, session: Session = Depends(get_sessi
     
     delete_testimonial(session, testimonial_id)
     return {"message": "Testimonial deleted successfully"}
+# Category
+@router.get("/categories")
+def read_categories(session: Session = Depends(get_session)):
+    """Get all categories"""
+    categories = session.exec(select(Category)).all()
+    return categories
+
+@router.get("/categories/{category_id}")
+def read_category(category_id: int, session: Session = Depends(get_session)):
+    """Get category by ID"""
+    category = session.get(Category, category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return category
+
+@router.post("/categories")
+def add_category(name: str = Form(...), session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Add new category"""
+    category = Category(name=name)
+    session.add(category)
+    session.commit()
+    session.refresh(category)
+    return category
+
+@router.put("/categories/{category_id}")
+def update_category(
+    category_id: int,
+    name: str = Form(...),
+    session: Session = Depends(get_session),
+    valid_token: bool = Depends(verify_token)):
+    """Update category"""
+    category = session.get(Category, category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    category.name = name
+    session.commit()
+    session.refresh(category)
+    
+    return {"message": "Category updated successfully", "category": category}
+
+def get_or_create_default_category(session: Session):
+    default = session.exec(select(Category).where(Category.id == 4)).first()
+    if not default:
+        default = Category(name="Orthers")
+        session.add(default)
+        session.commit()
+        session.refresh(default)
+    return default
+
+@router.delete("/categories/{category_id}")
+def remove_category(category_id: int, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Delete a category"""
+    category = session.get(Category, category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    default_category = get_or_create_default_category(session)
+
+    blogs = session.exec(select(Blogs).where(Blogs.category_id == category_id)).all()
+    for blog in blogs:
+        blog.category_id = default_category.id
+        session.add(blog) 
+
+    session.delete(category)
+    session.commit()
+
+    return {"message": f"Category deleted. {len(blogs)} blog(s) moved to 'Orthers'."}
+
+# Tag
+@router.get("/tags")
+def read_tags(session: Session = Depends(get_session)):
+    """Get all tags"""
+    tags = session.exec(select(Tag)).all()
+    return tags
+
+@router.get("/tags/{tag_id}")
+def get_tag_by_id(tag_id: int, session: Session = Depends(get_session)):
+    """Get tag by ID"""
+    tag = session.get(Tag, tag_id)
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+    return tag
+
+@router.post("/tags")
+def add_tag(name: str = Form(...), session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Add new tag"""
+    tag = Tag(name=name)
+    session.add(tag)
+    session.commit()
+    session.refresh(tag)
+    return tag
+
+@router.put("/tags/{tag_id}")
+def update_tag(
+    tag_id: int,
+    name: str = Form(...),
+    session: Session = Depends(get_session),
+    valid_token: bool = Depends(verify_token)
+):
+    """Update tag"""
+    tag = session.get(Tag, tag_id)
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+    
+    tag.name = name
+    session.commit()
+    session.refresh(tag)
+    
+    return {"message": "Tag updated successfully", "tag": tag}
+
+@router.delete("/tags/{tag_id}")
+def remove_tag(tag_id: int, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
+    """Delete a tag"""
+    tag = session.get(Tag, tag_id)
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+    blog_tag_links = session.exec(select(BlogTagLink).where(BlogTagLink.tag_id == tag_id)).all()
+    for link in blog_tag_links:
+        session.delete(link)
+
+    session.delete(tag)
+    session.commit()
+    return {"message": "Tag deleted successfully"}
+
 # Blogs
 @router.get("/blogs")
 def read_blogs(session: Session = Depends(get_session),limit: int = Query(5, ge=0),offset: int = Query(0, ge=0)):
     return get_blogs(session, limit=limit, offset=offset)
 
-@router.get("/blogs/categories")
-def get_unique_categories_blogs(session: Session = Depends(get_session)):
-    statement = select(Blogs.category).distinct()
+@router.get("/blogs/categories", response_model=List[CategoryUsed])
+def get_used_categories(session: Session = Depends(get_session)):
+    statement = (
+        select(Category)
+        .join(Blogs, Category.id == Blogs.category_id)
+        .distinct()
+    )
     results = session.exec(statement).all()
     return results
 
+@router.get("/blogs/tags", response_model=List[TagUsed])
+def get_used_tags(session: Session = Depends(get_session)):
+    statement = (
+        select(Tag)
+        .join(BlogTagLink, Tag.id == BlogTagLink.tag_id)
+        .distinct()
+    )
+    results = session.exec(statement).all()
+    return results
+
+@router.get("/blogs/filter-blogs-category/{category_id}")
+def filter_blogs_by_category(category_id:int,session:Session = Depends(get_session),limit: int = Query(5, ge=0),offset: int = Query(0, ge=0)):
+    return read_blogs_by_category_id(session,category_id=category_id,limit=limit,offset=offset)
+
+@router.get("/blogs/filter-blogs-tag/{tag_id}")
+def filter_blogs_by_tag(tag_id:int,session:Session = Depends(get_session),limit: int = Query(5, ge=0),offset: int = Query(0, ge=0)):
+    return read_blogs_by_tag_ids(session,tag_id=tag_id,limit=limit,offset=offset)
+
+@router.get("/blogs/filter-blogs-search-string/{search_string}")
+def filter_blogs_by_search_string(search_string:str,session:Session = Depends(get_session),limit: int = Query(5, ge=0),offset: int = Query(0, ge=0)):
+    """Filter blogs by search string"""
+    return query_blogs_by_search_string(session,search_string=search_string,limit=limit,offset=offset)
+
 @router.get("/blogs/{blog_id}")
 def get_blog_by_id_route(blog_id: int, session: Session = Depends(get_session)):
-    blog = get_blog_by_id(session, blog_id)
+    blog = session.get(Blogs, blog_id)
     if not blog:
         raise HTTPException(status_code=404, detail="Blog not found")
+    
     if blog.image:
         blog.image = f"{BASE_URL_IMAGE}{blog.image}"
-    return blog
+    
+    return {
+        "id": blog.id,
+        "title": blog.title,
+        "description": blog.description,
+        "body_blog": blog.body_blog,
+        "image": blog.image,
+        "created_at": blog.created_at,
+        "category": {
+            "id": blog.category.id,
+            "name": blog.category.name
+        } if blog.category else None,
+        "tags": [{"id": tag.id, "name": tag.name} for tag in blog.tags]
+    }
 
 @router.post("/blogs")
 async def add_blog(
@@ -605,17 +773,25 @@ async def add_blog(
     description: str = Form(...),
     body_blog: str = Form(...),
     image: Optional[UploadFile] = File(None),
-    category: str = Form(...),
+    category_id: int = Form(...),
+    tag_ids: Optional[str] = Form(None),
     session: Session = Depends(get_session),
     valid_token: bool = Depends(verify_token)
     ):
     """Add new Blog"""
     blog = Blogs(
-        title=title,
+         title=title,
         description=description,
         body_blog=body_blog,
-        category=category
+        category_id=category_id
     )
+    if tag_ids:
+        try:
+            tag_ids_list = json.loads(tag_ids)
+            tags = session.exec(select(Tag).where(Tag.id.in_(tag_ids_list))).all()
+            blog.tags = tags
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON format for tag_ids")
     if image and image.filename != "":
         upload_result = cloudinary.uploader.upload(
             image.file,
@@ -631,21 +807,30 @@ async def update_blog(
     description: str = Form(...),
     body_blog: str = Form(...),
     image: Optional[UploadFile] = File(None),
-    category: str = Form(...),
+    category_id: int = Form(...),
+    tag_ids: Optional[str] = Form(None),
     session: Session = Depends(get_session),
     valid_token: bool = Depends(verify_token)
     ):
     """Update info image and upload Blog"""
-    blog = get_blog_by_id(session, blog_id)
+    blog = session.get(Blogs, blog_id)
     if not blog:
         raise HTTPException(status_code=404, detail="Blog not found")
 
-    # Cập nhật dữ liệu form
+    # Update form data
     blog.title = title
     blog.description = description
     blog.body_blog = body_blog
-    blog.category = category
+    blog.category_id = category_id
 
+    if tag_ids:
+        try:
+            tag_ids_list = json.loads(tag_ids)  
+            tags = session.exec(select(Tag).where(Tag.id.in_(tag_ids_list))).all()
+            blog.tags = tags
+        except json.JSONDecodeError:
+            return {"error": "Invalid JSON format for tag_ids"}
+        
     if image and image.filename != "":
         if blog.image:
             try:
@@ -671,17 +856,18 @@ async def update_blog(
 @router.delete("/blogs/{blog_id}")
 def remove_blog(blog_id: int, session: Session = Depends(get_session), valid_token: bool = Depends(verify_token)):
     """Delete a Blog"""
-    blog = get_blog_by_id(session, blog_id)
+    blog = session.get(Blogs, blog_id)
     if not blog:
         raise HTTPException(status_code=404, detail="Blog not found")
-    
-    # Xóa ảnh hiện có nếu tồn tại trên Cloudinary
     if blog.image:
         try:
             cloudinary.api.resource(blog.image)
             cloudinary.api.delete_resources([blog.image])
         except NotFound:
             print("Image không tồn tại trong Cloudinary, bỏ qua xóa.")
-    
+    blog_tag_links = session.exec(select(BlogTagLink).where(BlogTagLink.blog_id == blog_id)).all()
+    for link in blog_tag_links:
+        session.delete(link)
+
     delete_blog(session, blog_id)
     return {"message": "Blog deleted successfully"}

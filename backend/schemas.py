@@ -78,17 +78,24 @@ class TestimonialsCreate(BaseModel):
     description: str
     image: Optional[str]
     
-class BlogsCreate(BaseModel):
+class BlogCreate(BaseModel):
     """Pydantic model for Blog"""
     title: str
     description: str
     body_blog: str
-    image: Optional[str]
-    category: str
-    created_at: Optional[datetime.datetime] = None
+    image: Optional[str] = None
+    category_id: int  
+    tag_ids: Optional[List[int]] = [] 
     
 class LoginCreate(BaseModel):
     """Pydantic model for login"""
     username: str
     password: str
+
+class CategoryUsed(BaseModel):
+    id: int
+    name: str
     
+class TagUsed(BaseModel):
+    id: int
+    name: str
