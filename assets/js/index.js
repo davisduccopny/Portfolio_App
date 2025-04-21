@@ -112,6 +112,7 @@ function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
                         </div>
                     `;        });
                 projectContainer.innerHTML = content;
+                imagesloaderContainer();
             })
             .catch(error => console.error("Error loading projects after retry:", error));
     }
@@ -286,7 +287,13 @@ function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
     
                 mappings.forEach(item => {
                     const el = document.querySelector(item.selector);
-                    if (el) el.textContent = data[item.key] || "N/A";
+                    if (el) {
+                        if (item.key.startsWith("des_about") || item.key === "about") {
+                            el.innerHTML = data[item.key] || "N/A";
+                        } else {
+                            el.textContent = data[item.key] || "N/A";
+                        }
+                    }
                 });
     
                 // Set birthdate
@@ -310,11 +317,14 @@ function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
                 const summary = document.querySelector(".sumary-cv-class");
                 if (summary) {
                     summary.querySelector("h4").textContent = data.name || "";
-                    summary.querySelector("p em").textContent = data.sumary || "";
+                    summary.querySelector("p em").innerHTML = data.sumary || "";
                     const listItems = summary.querySelectorAll("ul li");
                     if (listItems[0]) listItems[0].textContent = data.address || "";
                     if (listItems[1]) listItems[1].textContent = data.phone || "";
                     if (listItems[2]) listItems[2].textContent = data.email || "";
+                }
+                else{
+                    console.error("Summary element not found in the DOM.");
                 }
     
                 // Hình ảnh
@@ -381,12 +391,59 @@ function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
                 }
             });
     }
-
+// INIT ISOTOPE BEFORE LOAD CONTENT
+/**
+ * Init isotope layout and filters
+ */
+function imagesloaderContainer() {
+    document.querySelectorAll(".isotope-layout").forEach(function (isotopeItem) {
+      let layout = isotopeItem.getAttribute("data-layout") ?? "masonry";
+      let filter = isotopeItem.getAttribute("data-default-filter") ?? "*";
+      let sort = isotopeItem.getAttribute("data-sort") ?? "original-order";
+  
+      let initIsotope;
+      imagesLoaded(isotopeItem.querySelector(".isotope-container"), function () {
+        initIsotope = new Isotope(
+          isotopeItem.querySelector(".isotope-container"),
+          {
+            itemSelector: ".isotope-item",
+            layoutMode: layout,
+            filter: filter,
+            sortBy: sort,
+          }
+        );
+        // ✅ GẮN SỰ KIỆN SAU KHI ISOTOPE ĐƯỢC KHỞI TẠO
+        isotopeItem
+          .querySelectorAll(".isotope-filters li")
+          .forEach(function (filters) {
+            console.log(filters);
+            filters.addEventListener(
+              "click",
+              function () {
+                isotopeItem
+                  .querySelector(".isotope-filters .filter-active")
+                  .classList.remove("filter-active");
+                this.classList.add("filter-active");
+                initIsotope.arrange({
+                  filter: this.getAttribute("data-filter"),
+                });
+  
+                if (typeof aosInit === "function") {
+                  aosInit();
+                }
+              },
+              false
+            );
+          });
+      });
+    });
+  }
+  // INIT ISOTOPE LAYOUT
 fetchCategoryProjects();
 fetchExperiences();
 fetchEducation();
 fetchProjects();
 fetchAndUpdateSkills();
-document.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("load", function () {
     fetchProfile();
 });
