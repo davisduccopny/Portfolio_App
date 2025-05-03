@@ -1,0 +1,20 @@
+{% macro card_blog(blog) %}
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card p-3 w-100" style="height: fit-content;">
+        <a href="/blogs-body/{{blog.id}}/{{blog.slug}}" title="{{blog.title}}"><img src="{{blog.image}}" width="318" height="169" loading="lazy" decoding="async" class="card-img-top object-fit-cover rounded-4 w-100" alt="{{blog.title}}"
+            style="color: transparent;aspect-ratio: 16 / 9;"></a>
+        <div class="card-body">
+            <a href="/blogs-body/{{blog.id}}/{{blog.slug}}" title="{{blog.title}}">
+                <p class="card-title fw-bolder text-multiline-truncate">{{blog.title}}</p>
+            </a>
+            <div>
+                {% for tag in blog.tags %}
+                <a href="/blogs/filter-blogs-tag-render/{{tag.id}}/{{tag.slug}}">
+                    <span class="badge-custom">{{ tag.name }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}

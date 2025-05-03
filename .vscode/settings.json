@@ -1,0 +1,21 @@
+{
+    // Bắt tất cả .html trong workspace thành HTML thuần
+    "files.associations": {
+      // Áp dụng cho mọi file .html
+      "*.html": "html",
+      // (tuỳ chọn) nếu bạn muốn đánh dấu riêng template jinja:
+      // "templates/**/*.html": "html"
+    },
+  
+    // Emmet vẫn chạy trong HTML
+    "emmet.includeLanguages": {
+      "html": "html"
+    },
+  
+    // Dịch vụ formatter mặc định cho HTML
+    "editor.defaultFormatter": "vscode.html-language-features",
+  
+    // Đảm bảo HTML suggestion bật
+    "html.suggest.html5": true
+  }
+  

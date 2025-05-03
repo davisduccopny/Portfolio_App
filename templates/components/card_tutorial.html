@@ -1,0 +1,18 @@
+{% macro card_tutorial(tutorial) %}
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card p-3 w-100" style="height: fit-content;">
+        <a href="/learning-hub/tutorials-blog-body/{{tutorial.first_blog.id}}/{{tutorial.first_blog.slug}}" title="{{tutorial.title}}"><img src="{{tutorial.image}}" width="318" height="169" loading="lazy" decoding="async" class="card-img-top object-fit-cover rounded-4 w-100" alt="{{tutorial.title}}"
+            style="color: transparent;aspect-ratio: 16 / 9;"></a>
+        <div class="card-body">
+            <a href="/learning-hub/tutorials-blog-body/{{tutorial.first_blog.id}}/{{tutorial.first_blog.slug}}" title="{{tutorial.title}}">
+                <p class="card-title fw-bolder text-multiline-truncate">{{ tutorial.title}}</p>
+            </a>
+            <div>
+                <a href="/learning-hub/tutorials/{{tutorial.tag.id}}/{{tutorial.tag.slug}}">
+                    <span class="badge-custom">{{ tutorial.tag.name }}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}

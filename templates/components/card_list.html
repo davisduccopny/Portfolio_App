@@ -1,0 +1,21 @@
+<div class="col-12 position-relative" data-target-id="{{ blog.id }}">
+    <div class="blog-item d-flex align-items-center p-3 shadow-sm rounded-3 flex-md-nowrap">
+         <!-- Thumbnail -->
+        <div class="blog-thumbnail thumbnail-list-blogs flex-shrink-0 me-3">
+            <img src="{{ blog.image }}" 
+                alt="{{ blog.title }}" 
+                loading="lazy" 
+                decoding="async"
+                class="img-fluid rounded-4 object-fit-cover w-100 h-100" 
+                style="color: transparent; aspect-ratio: 16 / 9;">
+        </div>
+        <div class="blog-content flex-grow-1 mt-3 mt-md-0">
+            <h5 class="blog-title d-none d-md-block mb-1"><a href="/blogs-body/{{ blog.id }}/{{ blog.slug }}"
+                    class="stretched-link" title="{{blog.title}}">{{ blog.title }}</a></h5>
+            <p class="blog-title d-block d-md-none mb-1"><a href="/blogs-body/{{ blog.id }}/{{ blog.slug }}"
+                class="stretched-link" title="{{blog.title}}">{{ blog.title }}</a></p>
+            <p class="blog-description d-none d-md-block text-muted-custome text-multiline-truncate" style="font-size: 0.9rem;">
+                {{ blog.description}}</p>
+        </div>
+    </div>
+</div>

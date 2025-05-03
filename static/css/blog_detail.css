@@ -1,0 +1,534 @@
+/* CONTAINER */
+.container {
+  width: 100%;
+  min-width: 23.4375rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (width >= 575px) {
+  .container {
+      padding-inline: 2.5rem;
+  }
+}
+@media (width >= 860px) {
+  .container {
+      padding-inline: 3.75rem;
+  }
+}
+@media (width >= 1440px) {
+  .container {
+      max-width: 1440px;
+      padding-inline: 7rem;
+  }
+}
+/* CONTAINER FLUID */
+.container-fluid {
+  width: 100%;
+  min-width: 23.4375rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (width >= 575px) {
+  .container-fluid {
+    padding-inline: 1.5rem; 
+  }
+}
+
+@media (width >= 860px) {
+  .container-fluid {
+    padding-inline: 2rem;
+  }
+}
+
+@media (width >= 1440px) {
+  .container-fluid {
+    padding-inline: 3rem;
+  }
+}
+
+
+
+/* NAV ITEM */
+.navbar {
+  backdrop-filter: blur(1.25rem);
+  border-color: var(--card-category-color) !important;
+}
+
+.navbar-brand span {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.navbar-brand .text-green {
+  color: #a0e4dc;
+}
+
+.navbar-brand .text-blue {
+  color: var(--blog-nav-item-color);
+}
+
+.btn-login {
+  background-color: var(--blog-nav-item-color);
+  color: var(--heading-color);
+  border-radius: 8px;
+}
+
+.btn-login:hover {
+  background-color: var(--blog-nav-item-color);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--heading-color);
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.navbar-nav .nav-link {
+  color: var(--heading-color);
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: var(--blog-nav-item-color);
+  color: var(--background-color);
+}
+
+.navbar-nav .nav-item {
+  margin: 0 12px;
+}
+.dropdown-menu {
+  background-color: var(--background-color);  
+  border-radius: 10px;        
+  color: var(--default-color);
+}
+@media (max-width: 1024px) {
+  .dropdown-menu {
+  background-color: inherit;
+  }
+  
+}
+.dropdown-menu .dropdown-item{
+  color: var(--default-color);
+}
+.dropdown-menu .dropdown-item:hover {
+  background-color: var(--blog-nav-item-color);  
+  font-weight: bolder;              
+}
+
+.nav-item.dropdown .nav-link {
+  color: var(--default-color);               
+}
+
+
+/* CARD ITEM */
+.card {
+  background-color: var(--background-color);
+  border: none;
+}
+
+.card:hover {
+  background-color: var(--card-hoover-color);
+}
+
+.card-title,
+.card-text {
+  color: var(--default-color);
+}
+
+.card-title:hover {
+  color: var(--blog-nav-item-color);
+}
+
+.category-list a {
+  flex-shrink: 0;
+  color: var(--heading-color);
+  text-decoration: none;
+  display: block;
+}
+
+.category-list-wrapper {
+  white-space: nowrap;
+}
+
+.category-list a.active {
+  color: var(--blog-nav-item-color);
+  font-weight: bold;
+}
+
+.card {
+  border: none;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+.card .card-body {
+  padding: 0.5rem;
+}
+.badge-custom {
+  background-color: var(--card-category-color);
+  color: var(--default-color);
+  margin-right: 5px;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+.text-multiline-truncate {
+  display: -webkit-box;
+  display: box; /* For older specs (optional) */
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  box-orient: vertical; /* Older spec fallback (optional) */
+  overflow: hidden;
+}
+
+/* END CARD ITEM*/
+/* TECH-CARD */
+.tech-card {
+  background-color: var(--card-category-color);
+  color: var(--default-color);
+  border-radius: 10px;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: 0.3s ease;
+}
+.tech-card a{
+  color: var(--default-color);
+}
+.tech-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+.tech-card a:hover{
+  color: var(--blog-nav-item-color);
+}
+.tech-icon {
+  font-size: 1.5rem;
+  color: var(--blog-nav-item-color);
+}
+/* END-TECH-CARD */
+/* section 2*/
+.rank-circle {
+  width: 55px;
+  height: 55px;
+  background-color: var(--card-category-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 575px) {
+  .rank-circle {
+    width: 43px;
+    height: 43px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+  .rank-circle {
+    width: 49px;
+    height: 49px;
+    font-size: 1.4rem;
+  }
+}
+
+.featured-item {
+  background-color: var(--background-color);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.featured-content h5 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* END CARD ITEM */
+.blog-category span {
+  background-color: var(--badge-color);
+  color: var(--default-color);
+}
+
+.section-blog-detail {
+  background-color: var(--form-search-color);
+}
+
+.related-content .overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.related-content .overflow-x-auto::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+.related-content .overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+.related-content .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.related-scroll {
+  padding-bottom: 1rem;
+  scroll-padding-bottom: 1rem;
+}
+.blog-content p,
+.blog-content span,
+.blog-content ul,
+.blog-content ol,
+.blog-content li,
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6,
+.blog-content blockquote,
+.blog-content table,
+.blog-content thead,
+.blog-content tbody,
+.blog-content tfoot,
+.blog-content tr,
+.blog-content th,
+.blog-content td,
+.blog-content pre,
+.blog-content code,
+.blog-content iframe,
+.blog-content video,
+.blog-content audio,
+.blog-content source,
+.blog-content img,
+.blog-content a {
+    border: 0;
+    font-family: var(--default-font);
+    font-style: normal;
+    color: inherit;
+    background: none;
+    text-align: inherit;
+    vertical-align: baseline;
+    text-decoration: inherit;
+    box-sizing: border-box;
+    max-width: 100%; 
+    height: auto;    
+}
+
+
+.blog-content table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.thumbnail-list-blogs {
+  width: 120px;
+  height: 80px;
+  overflow: hidden;
+}
+
+/* TABLE OF CONTENT */
+.toc-js-automate a {
+  color: var(--text-muted-color);
+  text-decoration: none;
+}
+.toc .is-active-link{
+  color:var(--default-color);
+}
+
+.toc-js-automate li::marker {
+  color: var(--text-muted-color);
+}
+
+.toc::-webkit-scrollbar {
+  display: none;
+}
+
+#mobileToc .accordion-item {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+
+#mobileToc .accordion-button {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+  border: none;
+}
+
+#mobileToc .accordion-button:not(.collapsed) {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+
+#mobileToc .accordion-body {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+
+/* Tùy chỉnh dấu icon của accordion nếu cần */
+#mobileToc .accordion-button::after {
+  filter: invert(1);
+  /* đổi màu mũi tên trắng nếu nền tối */
+}
+
+/* BREAKRUM */
+.breadcrumb {
+  white-space: nowrap;
+  /* Không cho xuống dòng */
+  overflow-x: auto;
+  /* Cho phép cuộn ngang nếu dài quá */
+  -webkit-overflow-scrolling: touch;
+  /* Mượt hơn trên iOS */
+}
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: nowrap;
+  /* Không xuống hàng */
+  align-items: center;
+}
+/* Scroll */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  ::-webkit-scrollbar {
+    display: block;
+  }
+}
+/* NEWEST */
+#newest-blog img {
+  width: 80px;
+  height: 80px;
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+  #newest-blog img {
+    width: 100px;
+    height: 100px;
+  }
+}
+/* ICON BAR */
+.icon-bar a.active i {
+  color: var(--blog-nav-item-color);
+}
+.icon-bar{
+  width: 25%;
+}
+.icon-bar a:hover i {
+  color: var(--blog-nav-item-color);
+}
+@media (max-width: 768px) {
+  .icon-bar {
+    width: 65%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .icon-bar {
+    width: 40%;
+  }
+}
+/* -----icon bar desktop */
+/* .icon-bar-right-desktop{
+  width: 15%;
+} */
+/*------------------ Tutorial-------------- */
+
+.list-group-item{
+  background-color: var(--background-color);
+  color: var(--default-color);
+  border-color: var(--card-category-color);
+}
+.list-group-item:hover{
+  background-color: var(--blog-nav-item-color);
+  color: var(--default-color);
+  font-weight: bolder;
+}
+.list-group-item.active{
+  background-color: var(--blog-nav-item-color);
+  color: var(--default-color);
+  font-weight: bolder;
+}
+#mobileListtutorial .accordion-item {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+
+#mobileListtutorial .accordion-button {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+  border: none;
+}
+
+#mobileListtutorial .accordion-button:not(.collapsed) {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+
+#mobileListtutorial .accordion-body {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+#mobileListtutorial .accordion-body .list-group-item{
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+  border: none;
+}
+
+/* Tùy chỉnh dấu icon của accordion nếu cần */
+#mobileListtutorial .accordion-button::after {
+  filter: invert(1);
+  /* đổi màu mũi tên trắng nếu nền tối */
+}
+
+#mobileTagList .accordion-item {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+
+#mobileTagList .accordion-button {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+  border: none;
+}
+
+#mobileTagList .accordion-button:not(.collapsed) {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+
+#mobileTagList .accordion-body {
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+}
+#mobileTagList .accordion-body .list-group-item{
+  background-color: var(--form-search-color);
+  color: var(--default-color);
+  border: none;
+}
+
+/* Tùy chỉnh dấu icon của accordion nếu cần */
+#mobileTagList .accordion-button::after {
+  filter: invert(1);
+  /* đổi màu mũi tên trắng nếu nền tối */
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>{{profile.title}}</title>
+    <meta content="" name="description">
+    <meta
+        content="portfolio, web development, data analysis, creativity, projects, skills, design, data-driven solutions"
+        name="keywords">
+
+    <!-- Favicons -->
+    <link href="/static/image/favicon-16.png" rel="icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/static/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/static/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="/static/css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/blog_detail.css">
+</head>
+
+<body class="starter-page-page">
+    <!-- Header -->
+    {% include "components/header.html" %}
+
+    <main class="main">
+        <section id="big-layout-blog">
+            <div class="container py-5">
+                <div class="row g-4 px-3">
+                    <!-- Card lớn bên trái -->
+                    <div class="col-lg-6 rounded-top-4">
+                        <div class="card main-card p-3" style="height: fit-content;">
+                            <a href="/blogs-body/{{main_blog.id}}/{{main_blog.slug}}" title="{{main_blog.title}}"><img src="{{main_blog.image}}"
+                                    width="318" height="169" loading="lazy" decoding="async"
+                                    class="card-img-top rounded-4 object-fit-cover" alt="{{main_blog.title}}"
+                                    style="width: 100%;color: transparent; aspect-ratio: 16 / 9;"></a>
+                            <div class="card-body">
+                                <div class="text-multiline-truncate">
+                                    <a href="/blogs-body/{{main_blog.id}}/{{main_blog.slug}}" class="text-decoration-none" title="{{main_blog.title}}">
+                                        <p class="card-title fs-4 d-none d-md-block fw-bolder">{{ main_blog.title}}</p>
+                                        <p class="card-title d-block d-md-none fw-bolder">{{ main_blog.title}}</p>
+                                    </a>
+                                </div>
+                                <div class="text-multiline-truncate">
+                                    <p class="card-text d-none d-lg-block">{{ main_blog.description}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Các card nhỏ bên phải -->
+                    <div class="col-lg-6">
+                        <div class="row g-3 g-md-1 g-lg-3">
+                            {% for blog in small_blogs %}
+                            <div class="col-12 col-md-6 rounded-top-4">
+                                <div class="card p-3" style="height: fit-content;">
+                                    <a href="/blogs-body/{{blog.id}}/{{blog.slug}}" title="{{blog.title}}"><img src="{{blog.image}}"
+                                            width="318" height="169" loading="lazy" decoding="async"
+                                            class="card-img-top rounded-4 object-fit-cover w-100" alt="{{blog.title}}"
+                                            style="color: transparent; aspect-ratio: 16 / 9;"></a>
+                                    <div class="card-body">
+                                        <a href="/blogs-body/{{blog.id}}/{{blog.slug}}" class="text-decoration-none" title="{{blog.title}}">
+                                            <p class="card-title fw-bolder text-multiline-truncate">{{ blog.title}}</p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Button Xem thêm -->
+                <div class="text-center mt-4">
+                    <a class="btn btn-outline-light text-decoration-none" href="/blogs-page">Xem thêm</a>
+                </div>
+            </div>
+        </section>
+        <section id="newblogtwist" class="featured-section">
+            <div class="container">
+                <div class="d-flex align-items-center my-4">
+                    <h4 class="mb-0 me-2 fw-bold">Newest</h4>
+                    <div class="flex-grow-1 border-top"></div>
+                </div>
+                <div class="row g-4">
+                    <!-- Newest -->
+                    {% for blog in blogs_newest %}
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex align-items-center">
+                            <!-- Rank Circle -->
+                            <div class="rank-circle d-flex justify-content-center align-items-center rounded-circle">
+                                #{{ loop.index }}
+                            </div>
+
+                            <!-- Featured Content -->
+                            <div class="featured-content ms-3">
+                                <a href="/blogs-body/{{blog.id}}/{{blog.slug}}" class="text-decoration-none">
+                                    <p class="mb-1 card-title fw-bolder lead text-multiline-truncate">{{blog.title}}</p>
+                                </a>
+                                <small class="text-muted-custome">{{blog.created_at}}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </section>
+        <section id="Medium-layout-grid-3">
+            <div class="container py-5">
+                <div class="d-flex align-items-center my-4">
+                    <h4 class="mb-0 me-2 fw-bold">Category</h4>
+                    <div class="flex-grow-1 border-top"></div>
+                </div>
+
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-md-2 mb-4">
+                        <div class="category-list-wrapper d-md-block d-flex overflow-auto">
+                            <div class="category-list d-flex flex-md-column flex-row gap-3">
+                                <a href="#" class="active">All</a>
+                                {% for tag in tags_used %}
+                                <a href="/blogs/filter-blogs-tag-render/{{tag.id}}/{{tag.slug}}">{{tag.name}}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Content -->
+                    <div class="col-md-10">
+                        <div class="row g-4 g-md-1 g-lg-4 px-3 px-md-1 px-lg-3">
+                            {% import "components/card.html" as ui_card %}
+                            {% for blog in blogs %}
+                            {{ ui_card.card_blog(blog) }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Subcribe section -->
+        {% include "components/subcribe.html" %}
+    </main>
+
+    <!-- Footer -->
+    {% import "components/footer.html" as ui %}
+
+    {{ ui.footer(profile) }}
+
+    <!-- Scroll Top -->
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Preloader -->
+    <!-- <div id="preloader"></div> -->
+
+    <!-- Vendor JS Files -->
+    <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/vendor/php-email-form/validate.js"></script>
+    <script src="/static/vendor/aos/aos.js"></script>
+    <script src="/static/vendor/typed.js/typed.umd.js"></script>
+    <script src="/static/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="/static/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="/static/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="/static/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <script src="/static/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="/static/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Main JS File -->
+    <script src="/static/js/main_blog.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+{% macro footer(profile) %}
+<footer id="footer" class="footer position-relative min-h-md min-h-lg" style="min-height: 23.1875rem;">
+
+    <div class="container">
+
+      <!-- Enhanced Footer Info (2 columns) -->
+      <div class="row mb-5 w-75 m-auto">
+        <div class="col-md-6 text-center text-md-start">
+          <h5>About Us</h5>
+          <p>This is a personal blog sharing knowledge on programming, technology, and life experiences.</p>
+        </div>
+        <div class="col-md-6 text-center text-md-center">
+          <h5>Contact</h5>
+          <p>Email: <a href="mailto:{{profile.email}}">{{profile.email}}</a></p>
+          <p>Phone: {{profile.phone}}</p>
+        </div>
+      </div>
+    
+      <!-- Copyright & Credits -->
+      <div class="copyright text-center">
+        <p>© <span>Copyright</span> 2021 - <span id="current-year"></span> 
+          <strong class="px-1 sitename">Hoang Xuan Quoc</strong></p>
+      </div>
+      <div class="credits text-center">
+        Designed by <a href="https://github.com/davisduccopny">QuocHoangDV</a>
+      </div>
+      <div class="text-center">
+        <div class="mt-2">
+          <a href="{{profile.finallyacebook_link}}" class="me-3"><i class="bi bi-facebook"></i></a>
+          <a href="{{profile.github_link}}" class="me-3"><i class="bi bi-github"></i></a>
+          <a href="{{profile.linkedin_link}}"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    
+    </div>
+    
+
+</footer>
+{% endmacro %}

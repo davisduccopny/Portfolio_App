@@ -1,0 +1,60 @@
+<header id="header" class="navbar fixed-top navbar-expand-lg shadow border-bottom">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <span class="text-green">QQ</span><span class="text-blue">Blog</span>
+        </a>
+        <div class="d-flex align-items-center d-block d-lg-none">
+            <button class="icon-btn search-btn-show-blog me-0 me-md-5">
+                <i class="bi bi-search"></i>
+            </button>
+            <a href="#" class="btn btn-login px-4 ms-3 ms-md-5">Login</a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span style="color: var(--default-color);"><i class="bi bi-list "></i></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/blogs-page">Blog</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarLearningHub" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Learning Hub
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarLearningHub">
+                        <li><a class="dropdown-item py-2 rounded px-4" href="/resources"><i class="bi bi-file-earmark-text me-2"></i> Resources</a></li>
+                        <li><a class="dropdown-item py-2 rounded px-4" href="/learning-hub/tutorials"><i class="bi bi-journal-text me-2"></i> Tutorials</a></li>
+                        <li><a class="dropdown-item py-2 rounded px-4" href="/case-studies"><i class="bi bi-file-earmark-pdf me-2"></i> Case Studies</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarAbout" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        About
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarAbout">
+                        <li><a class="dropdown-item py-2 rounded px-4" href="/about"><i class="bi bi-info-circle me-2"></i> About Us</a></li>
+                        <li><a class="dropdown-item py-2 rounded px-4" href="/resume"><i class="bi bi-file-earmark-person me-2"></i> Resume</a></li>
+                        <li><a class="dropdown-item py-2 rounded px-4" href="/contact"><i class="bi bi-envelope me-2"></i> Contact</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item d-block d-lg-none">
+                    <a class="nav-link" aria-label="toggleDarkMode" href="javascript:void(0)" onclick="toggleDarkMode()">Change theme <i class=" themeIcon bi bi-brightness-high"></i></a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center d-none d-lg-block">
+                <button class="icon-btn search-btn-show-blog">
+                    <i class="bi bi-search"></i>
+                </button>
+                <button class="icon-btn" aria-label="toggleDarkMode" onclick="toggleDarkMode()">
+                    <i class=" themeIcon bi bi-brightness-high "></i>
+                </button>
+                <a href="#" class="btn btn-login px-4 ms-2">Login</a>
+            </div>
+        </div>
+    </div>
+</header>
